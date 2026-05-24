@@ -103,6 +103,8 @@ php artisan serve
 
 Admin: `/admin`
 
+Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin hosting.
+
 Seed login:
 
 - Email: `admin@example.com`
