@@ -117,36 +117,53 @@ class GravContentImportService
         $parent = $file->getPath() === $root ? null : $this->nearestImportedPage(dirname($file->getPath()), $root, $pagesByDirectory);
         $frontmatter = $document['frontmatter'];
 
-        $page = Page::query()->updateOrCreate(
-            [
-                'site_id' => $site->id,
-                'locale' => $locale,
-                'source_system' => self::SOURCE_SYSTEM,
-                'source_path' => $this->relativePath($file->getPathname(), $root),
-            ],
-            [
-                'parent_id' => $parent?->id,
-                'title' => $this->titleFor($frontmatter, $folderParts['slug']),
-                'slug' => $folderParts['slug'],
-                'template_type' => $this->pageTemplateType($file->getBasename('.md'), $frontmatter),
-                'status' => ($frontmatter['published'] ?? true) === false ? PageStatus::Draft : PageStatus::Published,
-                'excerpt_markdown' => trim($document['body']) ?: ($frontmatter['custom']['introtext'] ?? null),
-                'published_at' => $this->publishedAt($frontmatter),
-                'sort_order' => $folderParts['order'] ?? 9999,
-                'seo_title' => $frontmatter['seo-magic']['title'] ?? null,
-                'seo_description' => $frontmatter['seo-magic']['description'] ?? ($frontmatter['metadata']['description'] ?? ($frontmatter['meta'] ?? null)),
-                'og_title' => $frontmatter['seo-magic']['opengraph']['title'] ?? null,
-                'og_description' => $frontmatter['seo-magic']['opengraph']['description'] ?? null,
-                'robots_index' => ! ($frontmatter['metadata']['robots'] ?? '') || ! str_contains((string) $frontmatter['metadata']['robots'], 'noindex'),
-                'robots_follow' => ! ($frontmatter['metadata']['robots'] ?? '') || ! str_contains((string) $frontmatter['metadata']['robots'], 'nofollow'),
-                'source_folder' => $folder,
-                'source_template' => $file->getBasename('.md'),
-                'source_order_prefix' => $folderParts['order'],
-                'source_frontmatter' => $frontmatter,
-                'is_routable' => ($frontmatter['routable'] ?? true) !== false,
-                'is_visible_in_navigation' => ($frontmatter['visible'] ?? true) !== false,
-            ],
-        );
+        $sourcePath = $this->relativePath($file->getPathname(), $root);
+        $slug = $folderParts['slug'];
+        $fullPath = $this->fullPathFor($parent, $slug);
+
+        $page = Page::query()
+            ->where('site_id', $site->id)
+            ->where('locale', $locale)
+            ->where('source_system', self::SOURCE_SYSTEM)
+            ->where('source_path', $sourcePath)
+            ->first();
+
+        if (! $page) {
+            $page = Page::query()
+                ->where('site_id', $site->id)
+                ->where('locale', $locale)
+                ->where('full_path', $fullPath)
+                ->whereNull('source_system')
+                ->first() ?? new Page([
+                    'site_id' => $site->id,
+                    'locale' => $locale,
+                ]);
+        }
+
+        $page->fill([
+            'parent_id' => $parent?->id,
+            'title' => $this->titleFor($frontmatter, $slug),
+            'slug' => $slug,
+            'template_type' => $this->pageTemplateType($file->getBasename('.md'), $frontmatter),
+            'status' => ($frontmatter['published'] ?? true) === false ? PageStatus::Draft : PageStatus::Published,
+            'excerpt_markdown' => trim($document['body']) ?: ($frontmatter['custom']['introtext'] ?? null),
+            'published_at' => $this->publishedAt($frontmatter),
+            'sort_order' => $folderParts['order'] ?? 9999,
+            'seo_title' => $frontmatter['seo-magic']['title'] ?? null,
+            'seo_description' => $frontmatter['seo-magic']['description'] ?? ($frontmatter['metadata']['description'] ?? ($frontmatter['meta'] ?? null)),
+            'og_title' => $frontmatter['seo-magic']['opengraph']['title'] ?? null,
+            'og_description' => $frontmatter['seo-magic']['opengraph']['description'] ?? null,
+            'robots_index' => ! ($frontmatter['metadata']['robots'] ?? '') || ! str_contains((string) $frontmatter['metadata']['robots'], 'noindex'),
+            'robots_follow' => ! ($frontmatter['metadata']['robots'] ?? '') || ! str_contains((string) $frontmatter['metadata']['robots'], 'nofollow'),
+            'source_system' => self::SOURCE_SYSTEM,
+            'source_path' => $sourcePath,
+            'source_folder' => $folder,
+            'source_template' => $file->getBasename('.md'),
+            'source_order_prefix' => $folderParts['order'],
+            'source_frontmatter' => $frontmatter,
+            'is_routable' => ($frontmatter['routable'] ?? true) !== false,
+            'is_visible_in_navigation' => ($frontmatter['visible'] ?? true) !== false,
+        ])->save();
 
         if (trim($document['body']) !== '') {
             $section = Section::query()->updateOrCreate(
@@ -352,6 +369,19 @@ class GravContentImportService
     private function isModuleDirectory(string $directory): bool
     {
         return $this->folderParts(basename($directory))['is_module'];
+    }
+
+    private function fullPathFor(?Page $parent, string $slug): string
+    {
+        $slug = Str::slug($slug);
+
+        if (! $parent) {
+            return $slug === 'home' ? '/' : "/{$slug}";
+        }
+
+        $parentPath = rtrim($parent->full_path, '/');
+
+        return "{$parentPath}/{$slug}";
     }
 
     private function isRootMetadataFile(SplFileInfo $file, string $root): bool

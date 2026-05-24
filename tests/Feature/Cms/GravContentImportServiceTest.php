@@ -21,6 +21,44 @@ class GravContentImportServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_it_replaces_existing_placeholder_page_on_the_same_path(): void
+    {
+        $root = storage_path('framework/testing/grav-pages-placeholder');
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists("{$root}/01.home");
+
+        File::put("{$root}/01.home/modular.md", <<<'MD'
+---
+title: Blijwin
+template: modular
+published: true
+---
+
+Welkom bij Blijwin
+MD);
+
+        $site = Site::factory()->create(['domain' => 'localhost']);
+        $placeholder = Page::factory()->create([
+            'site_id' => $site->id,
+            'locale' => 'nl',
+            'title' => 'Welkom',
+            'slug' => 'home',
+            'source_system' => null,
+            'source_path' => null,
+        ]);
+
+        $stats = app(GravContentImportService::class)->import($root, $site);
+
+        $this->assertSame(1, $stats['pages']);
+        $this->assertSame(1, Page::query()->where('full_path', '/')->count());
+
+        $placeholder->refresh();
+
+        $this->assertSame('Blijwin', $placeholder->title);
+        $this->assertSame('grav', $placeholder->source_system);
+        $this->assertSame('01.home/modular.md', $placeholder->source_path);
+    }
+
     public function test_it_imports_grav_pages_modules_ordering_and_frontmatter(): void
     {
         $root = storage_path('framework/testing/grav-pages');
