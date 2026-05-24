@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Filament\Resources\Redirects\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class RedirectsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('site.name')->label('Site')->sortable(),
+                TextColumn::make('source_path')->searchable(),
+                TextColumn::make('target_url')->searchable(),
+                TextColumn::make('status_code')->badge()->sortable(),
+                TextColumn::make('locale')->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
