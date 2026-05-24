@@ -12,6 +12,9 @@
     @foreach($hreflang as $locale => $url)
         <link rel="alternate" hreflang="{{ $locale }}" href="{{ $url }}">
     @endforeach
+    <script>
+        window.TrackingWriterConfig = @json(app(\App\Services\Tracking\TrackingFrontendConfigService::class)->build(request()));
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased">

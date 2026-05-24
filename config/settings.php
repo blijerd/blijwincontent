@@ -78,4 +78,42 @@ return [
     'services' => [
         'aws_region' => 'us-east-1',
     ],
+
+    'tracking' => [
+        'routes' => [
+            'consent' => '/tracking-consent',
+            'collect' => '/tracking-collect',
+        ],
+        'field_name' => 'data[blijwin_t_info]',
+        'heartbeat_seconds' => 30,
+        'cookie_days' => 30,
+        'session_minutes' => 30,
+        'cookies' => [
+            'consent' => 'tw_consent',
+            'visitor' => 'tw_vid',
+            'session' => 'tw_sid',
+            'activity' => 'tw_last_seen',
+        ],
+        'consent' => [
+            'cookie_days' => 180,
+            'identifier_cookie_category' => 'analytics',
+            'categories' => [
+                'necessary' => [
+                    'label' => 'Noodzakelijk',
+                    'description' => 'Nodig om cookiekeuzes en server-side sessiecontext betrouwbaar te laten werken.',
+                    'required' => true,
+                ],
+                'analytics' => [
+                    'label' => 'Statistiek / analytics',
+                    'description' => 'Helpt om bezoek, contactmomenten en formuliergebruik te begrijpen en te verbeteren.',
+                    'required' => false,
+                ],
+                'marketing' => [
+                    'label' => 'Marketing en externe inhoud',
+                    'description' => 'Reserveert toestemming voor latere externe scripts en embeds.',
+                    'required' => false,
+                ],
+            ],
+        ],
+    ],
 ];

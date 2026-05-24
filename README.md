@@ -45,7 +45,21 @@ Markdown wordt gecachet, unsafe HTML wordt gestript en links worden via CommonMa
 
 ## Admin
 
-Filament resources zijn aanwezig voor sites, pages, sections, blocks, media assets en redirects. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
+Filament resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
+
+## Tracking
+
+De kern van de oude GRAV `tracking-writer` plugin is overgezet naar een relationele Laravel-implementatie, in dezelfde richting als Blijwin OS:
+
+- consent endpoint: `/tracking-consent`
+- collect endpoint: `/tracking-collect`
+- visitor/session identifiers met cookie-opslag na analytics consent en server-session fallback
+- relationele opslag voor visitors, sessions, page visits, contact attempts en consent decisions
+- pageview, heartbeat, page_end, mail/tel-clicks en form_submit tracking
+- verborgen formuliercontext via `data[blijwin_t_info]`
+- Filament overzicht voor tracking visitors
+
+Externe scripts, pixels en GRAV-import van historische trackingdata zijn bewust nog niet meegenomen in deze eerste CMS-versie.
 
 ## Settings
 
