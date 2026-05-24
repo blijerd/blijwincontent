@@ -8,6 +8,9 @@
             <div class="bw-mini-card bw-prose">
                 @if($block['model']->heading)<h2>{{ $block['model']->heading }}</h2>@endif
                 {!! $block['body_html'] !!}
+                @if($block['media'])
+                    @include('cms.sections.partials.block-media', ['block' => $block])
+                @endif
             </div>
         @endforeach
         </div>

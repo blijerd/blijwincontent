@@ -149,6 +149,15 @@ return [
         ],
     ],
 
+    'booking_requests' => [
+        'routes' => [
+            'form' => '/boeken/aanvraag',
+            'store' => '/boeken/api/aanvragen',
+        ],
+        'honeypot_field' => 'website_url',
+        'retry_limit' => 25,
+    ],
+
     'blijwinos' => [
         'enabled' => true,
         'base_url' => 'https://www.blijwin.nl',

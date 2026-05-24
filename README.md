@@ -39,7 +39,7 @@ De structuur kan later gemapt worden vanuit GRAV:
 - redirects naar `redirects`
 - vertaalde pagina's naar gedeelde `translation_group_id`
 
-De eerste GRAV pagina-import is beschikbaar via `cms:import-grav-pages` en de deployment-snapshot in `database/imports/grav-pages`. Die snapshot bevat Markdown en YAML metadata uit de bestaande GRAV `pages` map, maar bewust geen zware binaire media. De import maakt ook het hoofdmenu, submenu's en de header-switcher `Voor boekers` / `Voor fans` aan als relationele menu's. De DeployHQ post-deploy hook draait `cms:import-deployment-grav-pages` eenmalig zodra er nog geen GRAV-pagina's voor de doelsite bestaan. De import is idempotent op `source_system` en `source_path`; handmatig opnieuw importeren kan met `php artisan cms:import-deployment-grav-pages --force`.
+De eerste GRAV pagina-import is beschikbaar via `cms:import-grav-pages` en de deployment-snapshot in `database/imports/grav-pages`. Die snapshot bevat Markdown en YAML metadata uit de bestaande GRAV `pages` map, maar bewust geen zware binaire media. De import normaliseert bekende legacy-structuren zoals `storyblokken`, `contentblokjes`, `videos`, `pluspunten`, hero `coverImage`, frontmatter-afbeeldingen en `media_order` naar relationele sections, blocks en media-assets. De import maakt ook het hoofdmenu, submenu's en de header-switcher `Voor boekers` / `Voor fans` aan als relationele menu's. De DeployHQ post-deploy hook draait `cms:import-deployment-grav-pages` eenmalig zodra er nog geen GRAV-pagina's voor de doelsite bestaan. De import is idempotent op `source_system` en `source_path`; handmatig opnieuw importeren kan met `php artisan cms:import-deployment-grav-pages --force`.
 
 ## Rendering
 
@@ -110,6 +110,12 @@ Het CMS heeft een dedicated `BlijwinosApiClient` voor betrouwbare uitwisseling m
 - timeouts, retries, read-cache en relationele request logging in `blijwinos_api_logs`
 
 Functionele defaults staan in `config/settings.php` onder `blijwinos`. De write secret moet per omgeving veilig worden ingevuld voordat schrijven naar Blijwin OS werkt.
+
+## Boekingsaanvragen
+
+Het publieke aanvraagformulier staat standaard op `/boeken/aanvraag` en verstuurt naar `/boeken/api/aanvragen`. De aanvraag wordt altijd eerst relationeel opgeslagen in `booking_requests` met een `public_id`, payload, sync-status, beschikbaarheidsstatus en e-mailbevestigingsstatus. Daarna probeert `SubmitBookingRequestAction` de aanvraag via de Blijwin OS HMAC-koppeling door te schieten.
+
+Als Blijwin OS niet bereikbaar is of de write secret ontbreekt, blijft de aanvraag lokaal op `pending` staan. Er is geen permanente queue worker nodig: een cronjob kan `php artisan bookings:sync-pending` draaien om pending aanvragen later alsnog te versturen. De publieke frontend toont expliciete stappen voor `Wordt verzonden`, `Is beschikbaar`, `Bevestig je e-mailadres`, `Voorstel andere tijd` en lokale fallback.
 
 ## Settings
 

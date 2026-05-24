@@ -28,7 +28,7 @@
     "src": "resources/brand/images/blijwin25.avif"
   },
   "resources/css/app.css": {
-    "file": "assets/app-D7BnPMjI.css",
+    "file": "assets/app-C-7gxmaU.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -46,7 +46,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Z179L0J7.js",
+    "file": "assets/app-DWO8EQgz.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

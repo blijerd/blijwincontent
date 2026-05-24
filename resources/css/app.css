@@ -2,6 +2,7 @@
 @import './tracking-writer.css';
 @import './faq.css';
 @import './downloads.css';
+@import './booking-request.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -511,6 +512,137 @@
         box-shadow: 0 14px 28px rgba(43, 18, 80, 0.07);
     }
 
+    .bw-storyflow {
+        display: grid;
+        gap: 1.35rem;
+    }
+
+    .bw-storyflow__item {
+        display: grid;
+        gap: clamp(1rem, 3vw, 2rem);
+        align-items: center;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 1.9rem;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 36%),
+            linear-gradient(145deg, rgba(62, 24, 132, 0.98), rgba(43, 14, 96, 0.98));
+        padding: clamp(1.25rem, 3vw, 2rem);
+        color: #fff9ff;
+        box-shadow: var(--bw-page-shadow-soft);
+    }
+
+    .bw-storyflow__copy {
+        display: grid;
+        gap: 1rem;
+        color: rgba(255, 249, 255, 0.9);
+        font-size: clamp(1rem, 1.5vw, 1.18rem);
+    }
+
+    .bw-storyflow__copy.bw-prose,
+    .bw-storyflow__copy .bw-prose {
+        color: rgba(255, 249, 255, 0.9);
+    }
+
+    .bw-storyflow__copy .bw-pill {
+        background: rgba(255, 255, 255, 0.13);
+        color: #ffea9a;
+    }
+
+    .bw-storyflow__copy a:not(.bw-button-primary) {
+        color: #76f7ff;
+        text-decoration-color: rgba(118, 247, 255, 0.6);
+    }
+
+    .bw-storyflow__title {
+        margin: 0;
+        color: #fff9ff;
+        font-size: clamp(2rem, 4vw, 3.1rem);
+        line-height: 0.98;
+    }
+
+    .bw-storyflow__media {
+        min-width: 0;
+    }
+
+    .bw-story-media,
+    .bw-youtube {
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 1.2rem;
+        background: #14051f;
+        box-shadow: 0 24px 42px rgba(18, 4, 40, 0.28);
+    }
+
+    .bw-story-media img,
+    .bw-youtube iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        object-fit: cover;
+    }
+
+    .bw-youtube__button {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background:
+            radial-gradient(circle at 50% 50%, rgba(255, 211, 79, 0.22), transparent 18%),
+            linear-gradient(135deg, rgba(25, 184, 255, 0.14), rgba(244, 10, 130, 0.16)),
+            url('../brand/images/bg-patroonsterren.webp') center / 360px repeat,
+            linear-gradient(145deg, #20073e, #11031f);
+        color: #fff9ff;
+        cursor: pointer;
+    }
+
+    .bw-youtube__button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.2));
+    }
+
+    .bw-youtube__play {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: clamp(4rem, 11vw, 6rem);
+        aspect-ratio: 1;
+        border: 0.35rem solid var(--bw-brand-pink);
+        border-radius: 999px;
+        background: #ffe315;
+        box-shadow: 0 0 0 0.38rem rgba(43, 6, 72, 0.8), 0 18px 36px rgba(0, 0, 0, 0.32);
+    }
+
+    .bw-youtube__play::before {
+        content: '';
+        width: 0;
+        height: 0;
+        margin-left: 0.28rem;
+        border-top: 0.9rem solid transparent;
+        border-bottom: 0.9rem solid transparent;
+        border-left: 1.35rem solid #35105f;
+    }
+
+    .bw-youtube__copy {
+        position: absolute;
+        left: 1rem;
+        bottom: 0.8rem;
+        z-index: 1;
+        border-radius: 999px;
+        background: rgba(20, 5, 31, 0.66);
+        padding: 0.35rem 0.7rem;
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
     .bw-faq-item {
         border-bottom: 1px solid rgba(109, 53, 218, 0.14);
         padding: 1rem 0;
@@ -566,6 +698,20 @@
 
         .bw-grid-3 {
             grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .bw-storyflow__item {
+            grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.95fr);
+        }
+
+        .bw-storyflow__item--alternate,
+        .bw-storyflow__item--media-left {
+            grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1fr);
+        }
+
+        .bw-storyflow__item--alternate .bw-storyflow__copy,
+        .bw-storyflow__item--media-left .bw-storyflow__copy {
+            order: 2;
         }
     }
 

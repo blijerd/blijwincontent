@@ -8,6 +8,7 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Added
 
+- Added a public booking request form with local relational fallback storage, Blijwin OS submit attempts, status screens and a `bookings:sync-pending` retry command.
 - Added an Artisan admin password reset command for production lock-out recovery without reopening `/setup`.
 - Added relational navigation menus and menu items with Filament resources for the public header, submenu items and the `Voor boekers` / `Voor fans` switcher.
 - Added GRAV navigation import that creates the legacy header menu and audience switcher during page imports.
@@ -36,6 +37,8 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Fixed
 
+- Fixed GRAV imports missing legacy `storyflow`, `2koloms`, video, plus point and frontmatter media content by normalizing those structures into relational blocks and media assets.
+- Fixed imported storyflow and two-column rendering so legacy text and YouTube media appear on public pages with click-to-load `youtube-nocookie.com` embeds.
 - Fixed production GRAV imports by making Symfony YAML an explicit production dependency.
 - Fixed unreadable Filament login field labels in the custom admin theme.
 - Fixed public page, sitemap and hreflang rendering so inactive sites, non-routable pages and future-scheduled translations are not exposed.

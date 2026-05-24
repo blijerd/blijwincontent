@@ -8,6 +8,7 @@ use App\Services\Content\NavigationBuilderService;
 use App\Services\Downloads\DownloadCatalogBuilderService;
 use App\Services\Faq\FaqBuilderService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class PageViewModel
 {
@@ -38,6 +39,7 @@ class PageViewModel
                 'blocks' => $section->blocks->map(fn ($block): array => [
                     'model' => $block,
                     'body_html' => $this->markdown->render($block->body_markdown, "block:{$block->public_id}:body"),
+                    'media' => $this->mediaForBlock($block),
                 ]),
             ]);
     }
@@ -52,5 +54,57 @@ class PageViewModel
     public function audienceNavigation(): Collection
     {
         return $this->navigationBuilder->build($this->page->site, $this->page->locale, 'audience');
+    }
+
+    /** @return array<string, mixed>|null */
+    private function mediaForBlock($block): ?array
+    {
+        $payload = $block->source_payload ?? [];
+        $youtubeId = $this->youtubeId($payload);
+
+        if ($youtubeId) {
+            return [
+                'type' => 'youtube',
+                'youtube_id' => $youtubeId,
+                'embed_url' => "https://www.youtube-nocookie.com/embed/{$youtubeId}?autoplay=1&rel=0&modestbranding=1",
+                'label' => $payload['mediaLabel'] ?? $payload['label'] ?? $block->heading ?? 'Video afspelen',
+            ];
+        }
+
+        if ($block->image) {
+            return [
+                'type' => 'image',
+                'url' => $block->image->url(),
+                'alt' => $payload['afbeeldingAlt'] ?? $block->image->alt_text ?? $block->heading ?? '',
+            ];
+        }
+
+        return null;
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function youtubeId(array $payload): ?string
+    {
+        $value = $payload['youtubeCode'] ?? $payload['code'] ?? null;
+
+        if (! is_string($value) || trim($value) === '') {
+            $mediaType = (string) ($payload['mediaType'] ?? $payload['type'] ?? '');
+            $content = $payload['content'] ?? null;
+
+            $value = in_array($mediaType, ['youtube', 'video'], true) && is_string($content) ? $content : null;
+        }
+
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        $value = trim($value);
+
+        if (Str::contains($value, ['youtube.com', 'youtu.be'])) {
+            parse_str((string) parse_url($value, PHP_URL_QUERY), $query);
+            $value = is_string($query['v'] ?? null) ? $query['v'] : basename((string) parse_url($value, PHP_URL_PATH));
+        }
+
+        return preg_match('/^[A-Za-z0-9_-]{6,20}$/', $value) === 1 ? $value : null;
     }
 }

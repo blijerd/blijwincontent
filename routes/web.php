@@ -3,6 +3,8 @@
 use App\Http\Controllers\Downloads\DownloadDirectController;
 use App\Http\Controllers\Downloads\DownloadSecureController;
 use App\Http\Controllers\Downloads\DownloadSecureRequestController;
+use App\Http\Controllers\Bookings\BookingRequestFormController;
+use App\Http\Controllers\Bookings\StoreBookingRequestController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\RobotsTxtController;
 use App\Http\Controllers\SitemapController;
@@ -29,6 +31,10 @@ Route::post(config('settings.downloads.routes.secure_request', '/downloads/api/r
     ->name('downloads.secure-request');
 Route::get(config('settings.downloads.routes.secure_delivery', '/downloads/secure').'/{token}', DownloadSecureController::class)
     ->name('downloads.secure');
+Route::get(config('settings.booking_requests.routes.form', '/boeken/aanvraag'), BookingRequestFormController::class)
+    ->name('booking-requests.create');
+Route::post(config('settings.booking_requests.routes.store', '/boeken/api/aanvragen'), StoreBookingRequestController::class)
+    ->name('booking-requests.store');
 Route::get('/{path?}', PageController::class)
     ->where('path', '.*')
     ->name('pages.show');

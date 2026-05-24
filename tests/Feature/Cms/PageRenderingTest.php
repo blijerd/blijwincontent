@@ -105,6 +105,73 @@ class PageRenderingTest extends TestCase
             ->assertSee('Camping');
     }
 
+    public function test_it_renders_imported_storyflow_blocks_with_privacy_friendly_youtube(): void
+    {
+        $site = Site::factory()->create(['domain' => 'localhost']);
+        $page = Page::factory()->create([
+            'site_id' => $site->id,
+            'title' => 'Kinderfeestje',
+            'slug' => 'kinderfeestje',
+            'template_type' => TemplateType::LandingPage,
+            'status' => PageStatus::Published,
+        ]);
+        $section = Section::factory()->create([
+            'page_id' => $page->id,
+            'type' => SectionType::RichText,
+            'title' => 'Storyflow',
+            'source_template' => 'storyflow',
+        ]);
+        Block::factory()->create([
+            'section_id' => $section->id,
+            'heading' => 'Kinder-DJ Blijwin boeken',
+            'subheading' => 'Verhaal',
+            'body_markdown' => 'Wil je mij boeken? Omdat je me kent van Social Media.',
+            'source_payload' => [
+                'mediaType' => 'youtube',
+                'youtubeCode' => 'xzL6sx1VhHs',
+                'layout' => 'media-rechts',
+            ],
+        ]);
+
+        $this->get('/kinderfeestje')
+            ->assertOk()
+            ->assertSee('Kinder-DJ Blijwin boeken')
+            ->assertSee('Wil je mij boeken?', false)
+            ->assertSee('data-youtube-src="https://www.youtube-nocookie.com/embed/xzL6sx1VhHs?autoplay=1&amp;rel=0&amp;modestbranding=1"', false)
+            ->assertDontSee('<iframe', false);
+    }
+
+    public function test_it_renders_imported_two_column_media_blocks(): void
+    {
+        $site = Site::factory()->create(['domain' => 'localhost']);
+        $page = Page::factory()->create([
+            'site_id' => $site->id,
+            'title' => 'Contact',
+            'slug' => 'contact',
+            'template_type' => TemplateType::LandingPage,
+            'status' => PageStatus::Published,
+        ]);
+        $section = Section::factory()->create([
+            'page_id' => $page->id,
+            'type' => SectionType::TwoColumns,
+            'title' => 'Video',
+            'source_template' => '2koloms',
+        ]);
+        Block::factory()->create([
+            'section_id' => $section->id,
+            'body_markdown' => 'xzL6sx1VhHs',
+            'source_payload' => [
+                'type' => 'video',
+                'content' => 'xzL6sx1VhHs',
+            ],
+        ]);
+
+        $this->get('/contact')
+            ->assertOk()
+            ->assertSee('youtube-nocookie.com/embed/xzL6sx1VhHs', false)
+            ->assertDontSee('<iframe', false);
+    }
+
     public function test_it_does_not_render_pages_for_inactive_sites(): void
     {
         Site::factory()->create(['domain' => 'active.test']);

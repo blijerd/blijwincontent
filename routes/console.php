@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Auth\ResetAdminPasswordAction;
+use App\Actions\Bookings\RetryPendingBookingRequestsAction;
 use App\Actions\Grav\ImportDeploymentGravPagesAction;
 use App\Models\Site;
 use App\Models\User;
@@ -81,3 +82,12 @@ Artisan::command('cms:admin:reset-password {email : Existing admin email address
 
     return 0;
 })->purpose('Reset an existing CMS admin password without reopening setup');
+
+Artisan::command('bookings:sync-pending {--limit= : Maximum number of local booking requests to retry}', function (RetryPendingBookingRequestsAction $retryPending): int {
+    $limit = (int) ($this->option('limit') ?: config('settings.booking_requests.retry_limit', 25));
+    $stats = $retryPending->handle($limit);
+
+    $this->info("Retried {$stats['attempted']} booking requests, sent {$stats['sent']}, pending {$stats['pending']}.");
+
+    return 0;
+})->purpose('Retry locally stored booking requests against Blijwin OS');

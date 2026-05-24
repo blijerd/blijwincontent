@@ -220,6 +220,108 @@ MD);
         ]);
     }
 
+    public function test_it_imports_storyflow_and_legacy_two_column_blocks(): void
+    {
+        $root = storage_path('framework/testing/grav-legacy-blocks');
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists("{$root}/01.home/00._hero");
+        File::ensureDirectoryExists("{$root}/01.home/01._story");
+        File::ensureDirectoryExists("{$root}/01.home/02._columns");
+
+        File::put("{$root}/01.home/modular.md", <<<'MD'
+---
+title: Home
+template: modular
+---
+MD);
+
+        File::put("{$root}/01.home/00._hero/hero.md", <<<'MD'
+---
+title: Hero
+coverImage:
+    hero.jpg:
+        name: hero.jpg
+        type: image/jpeg
+        size: 1234
+        path: hero.jpg
+---
+
+# Hero heading
+MD);
+
+        File::put("{$root}/01.home/01._story/storyflow.md", <<<'MD'
+---
+title: Storyflow
+storyblokken:
+    -
+        eyebrow: Intro
+        titel: Eerste verhaalblok
+        tekst: "**Storytekst** met markdown."
+        mediaType: youtube
+        youtubeCode: abc123
+        ctaTekst: Meer lezen
+        ctaUrl: /meer
+---
+MD);
+
+        File::put("{$root}/01.home/02._columns/2koloms.md", <<<'MD'
+---
+title: Twee kolommen
+contentblokjes:
+    0:
+        content: "## Kolomtekst\n\nBody uit contentblokje."
+        type: content
+        kolomsize: '6'
+        afbeelding:
+            column.png:
+                name: column.png
+                type: image/png
+                size: 2222
+                path: column.png
+    1:
+        content: abc123
+        type: video
+        kolomsize: '6'
+    '*':
+        content: null
+        type: content
+        kolomsize: '4'
+---
+MD);
+
+        $site = Site::factory()->create(['domain' => 'localhost']);
+
+        app(GravContentImportService::class)->import($root, $site);
+
+        $hero = Section::where('source_path', '01.home/00._hero/hero.md')->firstOrFail();
+        $heroBlock = Block::where('section_id', $hero->id)->where('source_key', 'body')->firstOrFail();
+        $this->assertSame('hero.jpg', $heroBlock->image?->source_metadata['name']);
+        $this->assertSame('01.home/00._hero/hero.jpg', $heroBlock->image?->source_path);
+
+        $story = Section::where('source_path', '01.home/01._story/storyflow.md')->firstOrFail();
+        $this->assertSame(SectionType::RichText, $story->type);
+
+        $storyBlock = Block::where('section_id', $story->id)->where('source_key', 'item:0')->firstOrFail();
+        $this->assertSame('Eerste verhaalblok', $storyBlock->heading);
+        $this->assertSame('Intro', $storyBlock->subheading);
+        $this->assertSame('**Storytekst** met markdown.', $storyBlock->body_markdown);
+        $this->assertSame('/meer', $storyBlock->button_url);
+        $this->assertSame('youtube', $storyBlock->source_payload['mediaType']);
+
+        $columns = Section::where('source_path', '01.home/02._columns/2koloms.md')->firstOrFail();
+        $this->assertSame(SectionType::TwoColumns, $columns->type);
+        $this->assertSame(2, $columns->blocks()->count());
+
+        $textBlock = Block::where('section_id', $columns->id)->where('source_key', 'item:0')->firstOrFail();
+        $this->assertSame("## Kolomtekst\n\nBody uit contentblokje.", $textBlock->body_markdown);
+        $this->assertSame('6', $textBlock->source_payload['kolomsize']);
+        $this->assertSame('01.home/02._columns/column.png', $textBlock->image?->source_path);
+
+        $videoBlock = Block::where('section_id', $columns->id)->where('source_key', 'item:1')->firstOrFail();
+        $this->assertSame('video', $videoBlock->type->value);
+        $this->assertSame('abc123', $videoBlock->body_markdown);
+    }
+
     public function test_deployment_import_imports_bundled_pages_and_creates_site_when_needed(): void
     {
         $root = storage_path('framework/testing/deployment-grav-pages');

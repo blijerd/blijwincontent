@@ -44,6 +44,7 @@ class GravContentImportService
                 $stats['pages']++;
 
                 $stats['media'] += $this->upsertMediaForDirectory($file->getPath(), $root, $this->relativePath($file->getPathname(), $root), $locale);
+                $stats['media'] += $this->upsertReferencedMediaForDocument($file, $root, $locale);
             }
 
             foreach ($this->moduleMarkdownFiles($root) as $file) {
@@ -55,8 +56,9 @@ class GravContentImportService
 
                 $section = $this->upsertSection($file, $root, $parent);
                 $stats['sections']++;
-                $stats['blocks'] += $this->upsertBlocks($section, $file, $root);
+                $stats['blocks'] += $this->upsertBlocks($section, $file, $root, $locale);
                 $stats['media'] += $this->upsertMediaForDirectory($file->getPath(), $root, $this->relativePath($file->getPathname(), $root), $locale);
+                $stats['media'] += $this->upsertReferencedMediaForDocument($file, $root, $locale);
             }
 
             $menuStats = $this->upsertNavigationMenus($site, $locale);
@@ -231,7 +233,7 @@ class GravContentImportService
         );
     }
 
-    private function upsertBlocks(Section $section, SplFileInfo $file, string $root): int
+    private function upsertBlocks(Section $section, SplFileInfo $file, string $root, string $locale): int
     {
         $document = $this->readMarkdown($file);
         $frontmatter = $document['frontmatter'];
@@ -247,13 +249,14 @@ class GravContentImportService
                     'source_key' => "item:{$index}",
                 ],
                 [
-                    'type' => BlockType::Text,
+                    'type' => $this->blockType($item),
                     'sort_order' => ($index + 1) * 10,
                     'heading' => $item['titel'] ?? $item['title'] ?? $item['heading'] ?? null,
                     'subheading' => $item['intro'] ?? $item['eyebrow'] ?? null,
-                    'body_markdown' => $item['tekst'] ?? $item['text'] ?? $item['body'] ?? null,
+                    'body_markdown' => $item['tekst'] ?? $item['text'] ?? $item['body'] ?? $item['content'] ?? null,
                     'button_label' => $item['ctaTekst'] ?? $item['button_label'] ?? null,
                     'button_url' => $item['ctaUrl'] ?? $item['button_url'] ?? null,
+                    'image_id' => $this->firstMediaAssetFor($item, $file, $root, $locale)?->id,
                     'source_payload' => $item,
                 ],
             );
@@ -272,6 +275,7 @@ class GravContentImportService
                     'type' => BlockType::Text,
                     'sort_order' => 0,
                     'body_markdown' => trim($document['body']),
+                    'image_id' => $this->firstMediaAssetFor($frontmatter, $file, $root, $locale)?->id,
                     'source_payload' => ['field' => 'markdown_body'],
                 ],
             );
@@ -284,13 +288,78 @@ class GravContentImportService
     /** @return list<array<string, mixed>> */
     private function structuredBlockItems(array $frontmatter): array
     {
-        foreach (['kaarten', 'items', 'features', 'downloads', 'reviews', 'waarden', 'blocks'] as $key) {
+        $items = [];
+
+        foreach (['storyblokken', 'kaarten', 'items', 'features', 'downloads', 'reviews', 'waarden', 'blocks'] as $key) {
             if (isset($frontmatter[$key]) && is_array($frontmatter[$key]) && array_is_list($frontmatter[$key])) {
-                return array_values(array_filter($frontmatter[$key], 'is_array'));
+                array_push($items, ...array_values(array_filter($frontmatter[$key], 'is_array')));
             }
         }
 
-        return [];
+        if (isset($frontmatter['contentblokjes']) && is_array($frontmatter['contentblokjes'])) {
+            array_push($items, ...$this->legacyContentBlocks($frontmatter['contentblokjes']));
+        }
+
+        if (isset($frontmatter['videos']) && is_array($frontmatter['videos']) && array_is_list($frontmatter['videos'])) {
+            foreach (array_values(array_filter($frontmatter['videos'], 'is_array')) as $video) {
+                $items[] = array_merge($video, [
+                    'type' => 'video',
+                    'titel' => $video['label'] ?? null,
+                    'content' => $video['code'] ?? null,
+                ]);
+            }
+        }
+
+        foreach (['pluspunten', 'lijst'] as $key) {
+            if (! isset($frontmatter[$key]) || ! is_array($frontmatter[$key]) || ! array_is_list($frontmatter[$key])) {
+                continue;
+            }
+
+            foreach (array_values(array_filter($frontmatter[$key], 'is_array')) as $item) {
+                $items[] = array_merge($item, [
+                    'body' => $item['tekst'] ?? $item['text'] ?? $item['label'] ?? null,
+                ]);
+            }
+        }
+
+        foreach (['kolom1', 'kolom2', 'kolom3', 'kolom4'] as $key) {
+            if (isset($frontmatter[$key]) && is_string($frontmatter[$key]) && trim($frontmatter[$key]) !== '') {
+                $items[] = [
+                    'type' => 'content',
+                    'content' => trim($frontmatter[$key]),
+                    'source_field' => $key,
+                ];
+            }
+        }
+
+        return $items;
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function legacyContentBlocks(array $contentBlocks): array
+    {
+        $blocks = [];
+
+        foreach ($contentBlocks as $key => $block) {
+            if (! is_numeric($key) || ! is_array($block)) {
+                continue;
+            }
+
+            $blocks[] = $block;
+        }
+
+        return $blocks;
+    }
+
+    private function blockType(array $item): BlockType
+    {
+        $type = (string) ($item['type'] ?? $item['mediaType'] ?? '');
+
+        return match ($type) {
+            'afbeelding', 'afbeeldingschuin', 'image' => BlockType::Image,
+            'video', 'youtube' => BlockType::Video,
+            default => BlockType::Text,
+        };
     }
 
     private function upsertMediaForDirectory(string $directory, string $root, string $sourcePagePath, string $locale): int
@@ -331,6 +400,140 @@ class GravContentImportService
         }
 
         return $count;
+    }
+
+    private function upsertReferencedMediaForDocument(SplFileInfo $file, string $root, string $locale): int
+    {
+        $document = $this->readMarkdown($file);
+        $count = 0;
+
+        foreach ($this->mediaReferences($document['frontmatter']) as $reference) {
+            $this->upsertReferencedMedia($reference, $file, $root, $locale);
+            $count++;
+        }
+
+        return $count;
+    }
+
+    private function firstMediaAssetFor(array $payload, SplFileInfo $file, string $root, string $locale): ?MediaAsset
+    {
+        $reference = $this->mediaReferences($payload)[0] ?? null;
+
+        if (! $reference) {
+            return null;
+        }
+
+        return $this->upsertReferencedMedia($reference, $file, $root, $locale);
+    }
+
+    /** @param array{name?: string, type?: string, size?: int|string|null, path?: string} $reference */
+    private function upsertReferencedMedia(array $reference, SplFileInfo $file, string $root, string $locale): MediaAsset
+    {
+        $sourcePath = $this->mediaSourcePath((string) ($reference['path'] ?? $reference['name'] ?? ''), $file, $root);
+        $absolutePath = $root.DIRECTORY_SEPARATOR.$sourcePath;
+        $imageSize = is_file($absolutePath) ? (@getimagesize($absolutePath) ?: null) : null;
+        $size = is_file($absolutePath) ? (filesize($absolutePath) ?: 0) : (int) ($reference['size'] ?? 0);
+        $filename = (string) ($reference['name'] ?? basename($sourcePath));
+
+        return MediaAsset::query()->updateOrCreate(
+            [
+                'source_system' => self::SOURCE_SYSTEM,
+                'source_path' => $sourcePath,
+            ],
+            [
+                'disk' => 'local',
+                'path' => $sourcePath,
+                'mime_type' => $imageSize['mime'] ?? ((string) ($reference['type'] ?? '') ?: 'application/octet-stream'),
+                'original_filename' => $filename,
+                'size' => $size,
+                'width' => $imageSize[0] ?? null,
+                'height' => $imageSize[1] ?? null,
+                'locale' => $locale,
+                'source_page_path' => $this->relativePath($file->getPathname(), $root),
+                'source_metadata' => $reference,
+            ],
+        );
+    }
+
+    private function mediaSourcePath(string $path, SplFileInfo $file, string $root): string
+    {
+        $path = trim($path);
+
+        if ($path === '') {
+            return $this->relativePath($file->getPath(), $root);
+        }
+
+        if (str_starts_with($path, 'user/pages/')) {
+            return $path;
+        }
+
+        if (str_starts_with($path, '/')) {
+            return ltrim($path, '/');
+        }
+
+        $directoryRelativePath = $this->relativePath($file->getPath(), $root);
+
+        return trim($directoryRelativePath.'/'.$path, '/');
+    }
+
+    /** @return list<array{name?: string, type?: string, size?: int|string|null, path?: string}> */
+    private function mediaReferences(mixed $value): array
+    {
+        $references = [];
+        $this->collectMediaReferences($value, $references);
+
+        $unique = [];
+
+        foreach ($references as $reference) {
+            $key = (string) ($reference['path'] ?? $reference['name'] ?? '');
+
+            if ($key === '' || isset($unique[$key])) {
+                continue;
+            }
+
+            $unique[$key] = $reference;
+        }
+
+        return array_values($unique);
+    }
+
+    /** @param list<array{name?: string, type?: string, size?: int|string|null, path?: string}> $references */
+    private function collectMediaReferences(mixed $value, array &$references): void
+    {
+        if (is_string($value) && preg_match_all('/!\[[^\]]*]\(([^)]+\.(?:jpe?g|png|gif|webp|svg|pdf))\)/i', $value, $matches)) {
+            foreach ($matches[1] as $filename) {
+                $references[] = [
+                    'name' => basename($filename),
+                    'path' => $filename,
+                ];
+            }
+        }
+
+        if (is_string($value) && preg_match_all('/(?:^|,)\s*([^,\s]+\.(?:jpe?g|png|gif|webp|svg|pdf))\s*/i', $value, $matches)) {
+            foreach ($matches[1] as $filename) {
+                $references[] = [
+                    'name' => $filename,
+                    'path' => $filename,
+                ];
+            }
+        }
+
+        if (! is_array($value)) {
+            return;
+        }
+
+        if (isset($value['path']) && is_string($value['path'])) {
+            $references[] = [
+                'name' => is_string($value['name'] ?? null) ? $value['name'] : basename($value['path']),
+                'type' => is_string($value['type'] ?? null) ? $value['type'] : null,
+                'size' => $value['size'] ?? null,
+                'path' => $value['path'],
+            ];
+        }
+
+        foreach ($value as $nested) {
+            $this->collectMediaReferences($nested, $references);
+        }
     }
 
     /** @return array{frontmatter: array<string, mixed>, body: string} */
