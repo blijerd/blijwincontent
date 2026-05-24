@@ -14,9 +14,43 @@
     @endforeach
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-white text-slate-950 antialiased">
-    <main>
-        @yield('content')
-    </main>
+<body class="antialiased">
+    <div class="bw-site-shell">
+        <header class="bw-site-header">
+            <a href="{{ url('/') }}" class="bw-brand-lockup" aria-label="{{ $viewModel->page->site->name }}">
+                <span class="bw-brand-mark">{{ $viewModel->page->site->name }}</span>
+                <span class="bw-brand-copy">
+                    <strong>{{ $viewModel->page->site->name }}</strong>
+                    <span>feestelijke website</span>
+                </span>
+            </a>
+
+            <nav class="bw-site-nav" aria-label="Hoofdnavigatie">
+                <a href="{{ url('/') }}">Home</a>
+                <a href="{{ url('/blog') }}">Blog</a>
+                <a href="{{ url('/product') }}">Product</a>
+            </nav>
+        </header>
+
+        <main class="bw-page-stack">
+            @yield('content')
+        </main>
+    </div>
+
+    <footer class="bw-site-footer">
+        <div class="bw-site-footer__inner">
+            <div class="bw-card-topline"></div>
+            <div class="bw-site-footer__content">
+                <div class="bw-brand-lockup">
+                    <span class="bw-brand-mark">{{ $viewModel->page->site->name }}</span>
+                    <span class="bw-brand-copy">
+                        <strong>{{ $viewModel->page->site->name }}</strong>
+                        <span>is een handelsnaam van Blijevent</span>
+                    </span>
+                </div>
+                <p>Markdown-first, snel en klaar voor meertalige content.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

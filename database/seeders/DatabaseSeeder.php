@@ -56,6 +56,39 @@ class DatabaseSeeder extends Seeder
                 'heading' => 'Markdown content',
                 'body_markdown' => "## Structuur\n\nContent staat relationeel in pagina's, secties en blokken.",
             ]);
+
+            $contentSection = Section::factory()->create([
+                'page_id' => $page->id,
+                'type' => SectionType::Triplets,
+                'title' => 'Gebouwd voor vrolijke content',
+                'intro_markdown' => 'De website gebruikt dezelfde herkenbare Blijwin OS vormentaal, maar voelt als een publieke website.',
+                'sort_order' => 10,
+            ]);
+
+            foreach (['Markdown-first', 'Meertalig voorbereid', 'SEO als basis'] as $index => $heading) {
+                Block::factory()->create([
+                    'section_id' => $contentSection->id,
+                    'type' => BlockType::Text,
+                    'sort_order' => $index,
+                    'heading' => $heading,
+                    'body_markdown' => 'Zachte cards, duidelijke tekst en een relationele structuur die later netjes met GRAV-content kan samenwerken.',
+                ]);
+            }
+
+            $ctaSection = Section::factory()->create([
+                'page_id' => $page->id,
+                'type' => SectionType::Cta,
+                'title' => 'Klaar voor de volgende stap',
+                'intro_markdown' => 'Beheer pagina’s, secties, blokken, media en redirects vanuit Filament.',
+                'sort_order' => 20,
+            ]);
+
+            Block::factory()->create([
+                'section_id' => $ctaSection->id,
+                'type' => BlockType::Button,
+                'button_label' => 'Naar de admin',
+                'button_url' => '/admin',
+            ]);
         }
     }
 }
