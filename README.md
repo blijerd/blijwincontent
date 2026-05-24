@@ -18,6 +18,7 @@ Zelfstandig Laravel 12 + Filament 4 CMS voor markdown-first contentbeheer. Dit p
 - `Block`: relationele contentblokken met Markdown body, CTA en optionele media.
 - `MediaAsset`: media naast content, passend bij latere GRAV page-folder mapping.
 - `Redirect`: locale-specifieke redirects.
+- `FaqCategory` en `FaqItem`: centrale veelgestelde vragen, koppelbaar aan FAQ-secties.
 - `ActivityLog`: basis voor audit trail.
 
 Er is bewust geen generieke JSON pagebuilder. Markdown content staat in expliciete velden en structuur staat relationeel in MySQL.
@@ -60,6 +61,20 @@ De kern van de oude GRAV `tracking-writer` plugin is overgezet naar een relation
 - Filament overzicht voor tracking visitors
 
 Externe scripts, pixels en GRAV-import van historische trackingdata zijn bewust nog niet meegenomen in deze eerste CMS-versie.
+
+## Veelgestelde Vragen
+
+De kern van de oude GRAV `veelgestelde-vragen` plugin is relationeel overgezet:
+
+- centrale FAQ categorieen en vragen in Filament
+- FAQ-secties kunnen categorieen hergebruiken
+- Markdown-antwoorden met veilige rendering en caching
+- `{trefwoord}` en `{keyword}` tokenvervanging per sectie
+- zoeken, categoriefilters, initial limit, CTA en accordion-gedrag
+- FAQPage JSON-LD output voor SEO
+- importservice voor latere extractie uit JSON-LD en Markdown headings
+
+De volledige GRAV-import UI is bewust nog niet gebouwd; de services bereiden die stap wel voor.
 
 ## Settings
 

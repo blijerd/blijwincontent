@@ -4,6 +4,7 @@ namespace App\ViewModels;
 
 use App\Models\Page;
 use App\Services\Content\MarkdownRenderService;
+use App\Services\Faq\FaqBuilderService;
 use Illuminate\Support\Collection;
 
 class PageViewModel
@@ -11,8 +12,8 @@ class PageViewModel
     public function __construct(
         public readonly Page $page,
         private readonly MarkdownRenderService $markdown,
-    ) {
-    }
+        private readonly FaqBuilderService $faqBuilder,
+    ) {}
 
     public function excerptHtml(): string
     {
@@ -28,6 +29,7 @@ class PageViewModel
             ->map(fn ($section): array => [
                 'model' => $section,
                 'intro_html' => $this->markdown->render($section->intro_markdown, "section:{$section->public_id}:intro"),
+                'faq' => $this->faqBuilder->build($section),
                 'blocks' => $section->blocks->map(fn ($block): array => [
                     'model' => $block,
                     'body_html' => $this->markdown->render($block->body_markdown, "block:{$block->public_id}:body"),

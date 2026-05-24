@@ -1,0 +1,95 @@
+@layer components {
+    .bw-faq-intro {
+        margin-top: 1rem;
+    }
+
+    .bw-faq-toolbar {
+        display: grid;
+        gap: 0.9rem;
+        margin: 1.4rem 0;
+    }
+
+    .bw-faq-search input {
+        width: 100%;
+        border: 1px solid rgba(111, 71, 190, 0.18);
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--bw-page-ink);
+        padding: 0.85rem 1rem;
+        font: inherit;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .bw-faq-search input:focus {
+        border-color: var(--bw-brand-pink);
+        outline: 3px solid rgba(244, 10, 130, 0.16);
+    }
+
+    .bw-faq-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .bw-faq-filters button,
+    .bw-faq-more {
+        border: 1px solid rgba(111, 71, 190, 0.2);
+        border-radius: 999px;
+        background: #ffffff;
+        color: var(--bw-page-ink);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+        padding: 0.55rem 0.85rem;
+        transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .bw-faq-filters button:hover,
+    .bw-faq-more:hover {
+        transform: translateY(-1px);
+    }
+
+    .bw-faq-filters button.is-active {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--bw-brand-pink), var(--bw-brand-orange));
+        color: #ffffff;
+    }
+
+    .bw-faq-list {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .bw-faq-item[hidden] {
+        display: none;
+    }
+
+    .bw-faq-item summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        cursor: pointer;
+    }
+
+    .bw-faq-item summary small {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        background: rgba(25, 184, 255, 0.13);
+        color: #255580;
+        font-size: 0.76rem;
+        font-weight: 800;
+        padding: 0.22rem 0.55rem;
+    }
+
+    .bw-faq-empty {
+        margin-top: 1rem;
+        color: var(--bw-page-soft);
+        font-weight: 700;
+    }
+
+    .bw-faq-more,
+    .bw-faq-cta {
+        margin-top: 1rem;
+    }
+}
