@@ -8,6 +8,7 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Added
 
+- Added an Artisan admin password reset command for production lock-out recovery without reopening `/setup`.
 - Added relational navigation menus and menu items with Filament resources for the public header, submenu items and the `Voor boekers` / `Voor fans` switcher.
 - Added GRAV navigation import that creates the legacy header menu and audience switcher during page imports.
 - Added a per-site search indexing mode that can fully allow indexing or block indexing through dynamic `robots.txt`, sitemap output, meta robots and `X-Robots-Tag` headers.

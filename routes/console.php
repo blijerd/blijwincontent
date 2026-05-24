@@ -1,10 +1,15 @@
 <?php
 
+use App\Actions\Auth\ResetAdminPasswordAction;
 use App\Actions\Grav\ImportDeploymentGravPagesAction;
 use App\Models\Site;
+use App\Models\User;
 use App\Services\Grav\GravContentImportService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -44,3 +49,35 @@ Artisan::command('cms:import-deployment-grav-pages {--force : Re-import even whe
 
     return 0;
 })->purpose('Import the bundled Grav page snapshot during deployment');
+
+Artisan::command('cms:admin:reset-password {email : Existing admin email address} {--password= : New password, generated when omitted}', function (ResetAdminPasswordAction $resetAdminPassword): int {
+    $email = (string) $this->argument('email');
+    $password = (string) ($this->option('password') ?: 'A1a'.Str::random(15));
+
+    $validator = Validator::make(
+        ['email' => $email, 'password' => $password],
+        [
+            'email' => ['required', 'email:rfc', 'exists:users,email'],
+            'password' => ['required', Password::min(12)->mixedCase()->numbers()],
+        ],
+    );
+
+    if ($validator->fails()) {
+        foreach ($validator->errors()->all() as $error) {
+            $this->error($error);
+        }
+
+        return 1;
+    }
+
+    $user = User::query()->where('email', $email)->firstOrFail();
+    $resetAdminPassword->execute($user, $password);
+
+    $this->info("Admin password reset for {$email}.");
+
+    if (! $this->option('password')) {
+        $this->line("Generated password: {$password}");
+    }
+
+    return 0;
+})->purpose('Reset an existing CMS admin password without reopening setup');

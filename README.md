@@ -138,7 +138,7 @@ npm run build
 php artisan serve
 ```
 
-Setup: `/setup` zolang er nog geen beheerder bestaat. `/admin` en `/admin/login` sturen in die situatie ook door naar de setup.
+Setup: `/setup` zolang er nog geen beheerder bestaat. `/admin` en `/admin/login` sturen in die situatie ook door naar de setup. Zodra er een beheerder bestaat, is setup gesloten. Gebruik `php artisan cms:admin:reset-password admin@example.com` om een bestaand adminwachtwoord veilig te herstellen zonder setup opnieuw open te zetten.
 
 Admin: `/admin`
 

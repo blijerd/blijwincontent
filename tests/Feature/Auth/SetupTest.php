@@ -83,6 +83,41 @@ class SetupTest extends TestCase
         $this->assertSame(0, ActivityLog::query()->count());
     }
 
+    public function test_admin_password_can_be_reset_from_artisan(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'admin@example.com',
+            'password' => 'OudWachtwoord123',
+            'remember_token' => 'token',
+        ]);
+
+        $this->artisan('cms:admin:reset-password', [
+            'email' => 'admin@example.com',
+            '--password' => 'NieuwWachtwoord123',
+        ])->assertExitCode(0);
+
+        $user->refresh();
+
+        $this->assertTrue(Hash::check('NieuwWachtwoord123', $user->password));
+        $this->assertNull($user->remember_token);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertDatabaseHas('activity_logs', [
+            'event' => 'admin_password_reset',
+            'subject_type' => $user->getMorphClass(),
+            'subject_id' => $user->id,
+        ]);
+    }
+
+    public function test_admin_password_reset_requires_existing_user(): void
+    {
+        $this->artisan('cms:admin:reset-password', [
+            'email' => 'missing@example.com',
+            '--password' => 'NieuwWachtwoord123',
+        ])->assertExitCode(1);
+
+        $this->assertSame(0, ActivityLog::query()->count());
+    }
+
     public function test_setup_validates_required_account_fields(): void
     {
         $this->from('/setup')->post('/setup', [
