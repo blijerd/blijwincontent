@@ -10,7 +10,9 @@ use App\Filament\Resources\Blocks\Schemas\BlockForm;
 use App\Filament\Resources\Blocks\Schemas\BlockInfolist;
 use App\Filament\Resources\Blocks\Tables\BlocksTable;
 use App\Models\Block;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class BlockResource extends Resource
     protected static ?string $model = Block::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_CONTENT;
+
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $recordTitleAttribute = 'heading';
 

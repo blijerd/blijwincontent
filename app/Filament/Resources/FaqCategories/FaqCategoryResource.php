@@ -8,7 +8,9 @@ use App\Filament\Resources\FaqCategories\Pages\ListFaqCategories;
 use App\Filament\Resources\FaqCategories\Schemas\FaqCategoryForm;
 use App\Filament\Resources\FaqCategories\Tables\FaqCategoriesTable;
 use App\Models\FaqCategory;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class FaqCategoryResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
 
     protected static ?string $navigationLabel = 'FAQ categorieen';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_CONTENT;
+
+    protected static ?int $navigationSort = 40;
 
     protected static ?string $recordTitleAttribute = 'title';
 

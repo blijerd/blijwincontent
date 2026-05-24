@@ -8,7 +8,9 @@ use App\Filament\Resources\DownloadCategories\Pages\ListDownloadCategories;
 use App\Filament\Resources\DownloadCategories\Schemas\DownloadCategoryForm;
 use App\Filament\Resources\DownloadCategories\Tables\DownloadCategoriesTable;
 use App\Models\DownloadCategory;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class DownloadCategoryResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowDownTray;
 
     protected static ?string $navigationLabel = 'Downloads';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_DOWNLOADS;
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'title';
 

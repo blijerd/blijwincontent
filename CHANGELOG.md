@@ -25,6 +25,8 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Changed
 
+- Changed the Filament admin sidebar to use grouped CMS navigation and improved topbar/sidebar contrast.
+- Changed the custom Filament admin theme to use a calmer light CMS interface and disabled admin dark mode.
 - Changed the public header to render admin-configured navigation instead of hardcoded links.
 - Changed the admin login bootstrap behavior so `/admin` and `/admin/login` redirect to `/setup` while no CMS user exists.
 - Clarified the DirectAdmin/DeployHQ target path documentation so deployments place the Laravel app beside `public_html` instead of inside it.

@@ -8,7 +8,9 @@ use App\Filament\Resources\DownloadItems\Pages\ListDownloadItems;
 use App\Filament\Resources\DownloadItems\Schemas\DownloadItemForm;
 use App\Filament\Resources\DownloadItems\Tables\DownloadItemsTable;
 use App\Models\DownloadItem;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class DownloadItemResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static ?string $navigationLabel = 'Download items';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_DOWNLOADS;
+
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'title';
 

@@ -8,7 +8,9 @@ use App\Filament\Resources\FaqItems\Pages\ListFaqItems;
 use App\Filament\Resources\FaqItems\Schemas\FaqItemForm;
 use App\Filament\Resources\FaqItems\Tables\FaqItemsTable;
 use App\Models\FaqItem;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class FaqItemResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
 
     protected static ?string $navigationLabel = 'FAQ vragen';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_CONTENT;
+
+    protected static ?int $navigationSort = 50;
 
     protected static ?string $recordTitleAttribute = 'question';
 

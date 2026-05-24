@@ -4,7 +4,9 @@ namespace App\Filament\Resources\TrackingVisitors;
 
 use App\Filament\Resources\TrackingVisitors\Pages\ListTrackingVisitors;
 use App\Models\TrackingVisitor;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,11 +23,13 @@ class TrackingVisitorResource extends Resource
 
     protected static ?string $navigationLabel = 'Tracking visitors';
 
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_TRACKING;
+
     protected static ?string $modelLabel = 'tracking visitor';
 
     protected static ?string $pluralModelLabel = 'tracking visitors';
 
-    protected static ?int $navigationSort = 70;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Schema $schema): Schema
     {

@@ -10,7 +10,9 @@ use App\Filament\Resources\Redirects\Schemas\RedirectForm;
 use App\Filament\Resources\Redirects\Schemas\RedirectInfolist;
 use App\Filament\Resources\Redirects\Tables\RedirectsTable;
 use App\Models\Redirect;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class RedirectResource extends Resource
     protected static ?string $model = Redirect::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_SEO_MANAGEMENT;
+
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'source_path';
 

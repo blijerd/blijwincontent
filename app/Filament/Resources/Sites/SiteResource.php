@@ -10,7 +10,9 @@ use App\Filament\Resources\Sites\Schemas\SiteForm;
 use App\Filament\Resources\Sites\Schemas\SiteInfolist;
 use App\Filament\Resources\Sites\Tables\SitesTable;
 use App\Models\Site;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class SiteResource extends Resource
     protected static ?string $model = Site::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_SEO_MANAGEMENT;
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'name';
 

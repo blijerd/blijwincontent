@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Http\Middleware\RedirectToSetupWhenNoUsersExist;
+use App\Support\Filament\AdminNavigation;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,7 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Blijwin Content')
             ->font('Nunito')
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->darkMode(false)
             ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups(AdminNavigation::orderedGroups())
             ->colors([
                 'primary' => Color::hex('#6d35da'),
                 'danger' => Color::hex('#e92d79'),

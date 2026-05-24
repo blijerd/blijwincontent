@@ -9,7 +9,9 @@ use App\Filament\Resources\NavigationMenus\Pages\ViewNavigationMenu;
 use App\Filament\Resources\NavigationMenus\Schemas\NavigationMenuForm;
 use App\Filament\Resources\NavigationMenus\Tables\NavigationMenusTable;
 use App\Models\NavigationMenu;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -22,6 +24,10 @@ class NavigationMenuResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $navigationLabel = 'Menu’s';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_STRUCTURE;
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'title';
 

@@ -8,7 +8,9 @@ use App\Filament\Resources\DownloadFormats\Pages\ListDownloadFormats;
 use App\Filament\Resources\DownloadFormats\Schemas\DownloadFormatForm;
 use App\Filament\Resources\DownloadFormats\Tables\DownloadFormatsTable;
 use App\Models\DownloadFormat;
+use App\Support\Filament\AdminNavigation;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +23,10 @@ class DownloadFormatResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentArrowDown;
 
     protected static ?string $navigationLabel = 'Download formats';
+
+    protected static string|UnitEnum|null $navigationGroup = AdminNavigation::GROUP_DOWNLOADS;
+
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $recordTitleAttribute = 'label';
 
