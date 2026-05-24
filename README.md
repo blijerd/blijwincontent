@@ -134,13 +134,13 @@ php artisan serve
 
 Admin: `/admin`
 
-Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin hosting.
+Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin hosting. Deploy de repository zelf naar de domein-root, bijvoorbeeld `/home/u26717p132995/domains/cms.vieranders.nl`, niet naar `/home/u26717p132995/domains/cms.vieranders.nl/public_html`. Alleen `public_html` is publiek; Laravel moet naast `public_html` blijven staan zodat `public_html/index.php` `../vendor/autoload.php` en `../bootstrap/app.php` kan laden.
 
 De DeployHQ-configuratie kopieert repository-bestanden en draait nu geen Vite build hook. Daarom staat `public_html/build` in Git en moet `npm run build` worden gedraaid en mee gecommit bij frontendwijzigingen.
 
 DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script controleert PHP 8.4+, installeert ontbrekende productie-dependencies met `composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction`, voert database-migraties uit met `php artisan migrate --force`, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie de release niet actief maakt.
 
-Selecteer op DirectAdmin PHP 8.4 of nieuwer voor `cms.vieranders.nl` en zorg dat dezelfde versie beschikbaar is voor het DeployHQ SSH command. Als de server meerdere PHP-binaries heeft, kan de hook met `PHP_BIN=/pad/naar/php84 ./scripts/deploy/post_deploy.sh` worden aangeroepen. Als Composer niet als `composer` beschikbaar is, zet dan `COMPOSER_BIN=/pad/naar/composer`.
+Selecteer op DirectAdmin PHP 8.4 of nieuwer voor `cms.vieranders.nl` en zorg dat dezelfde versie beschikbaar is voor het DeployHQ SSH command. Als de server meerdere PHP-binaries heeft, kan de hook met `PHP_BIN=/pad/naar/php84 ./scripts/deploy/post_deploy.sh` worden aangeroepen. Als Composer niet als `composer` beschikbaar is, zet dan `COMPOSER_BIN=/pad/naar/composer`. Een Apache/LSAPI log met `include_path='.:/opt/alt/php83/...` betekent dat de site nog op PHP 8.3 draait en niet aan de projectvereiste voldoet.
 
 Seed login:
 

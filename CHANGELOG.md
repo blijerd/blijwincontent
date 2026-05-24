@@ -19,6 +19,7 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Changed
 
+- Clarified the DirectAdmin/DeployHQ target path documentation so deployments place the Laravel app beside `public_html` instead of inside it.
 - Changed the DeployHQ post-deploy hook to verify PHP 8.4+ and install missing production Composer dependencies before running Laravel deployment commands.
 
 ### Fixed
