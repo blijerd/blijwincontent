@@ -33,5 +33,6 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Fixed
 
+- Fixed production GRAV imports by making Symfony YAML an explicit production dependency.
 - Fixed unreadable Filament login field labels in the custom admin theme.
 - Fixed public page, sitemap and hreflang rendering so inactive sites, non-routable pages and future-scheduled translations are not exposed.
