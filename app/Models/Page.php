@@ -101,8 +101,7 @@ class Page extends Model
 
     public function translations(): HasMany
     {
-        return $this->hasMany(Page::class, 'translation_group_id', 'translation_group_id')
-            ->whereKeyNot($this->getKey());
+        return $this->hasMany(Page::class, 'translation_group_id', 'translation_group_id');
     }
 
     public function scopePublished(Builder $query): Builder
@@ -112,5 +111,10 @@ class Page extends Model
             ->where(function (Builder $query): void {
                 $query->whereNull('published_at')->orWhere('published_at', '<=', now());
             });
+    }
+
+    public function scopeRoutable(Builder $query): Builder
+    {
+        return $query->where('is_routable', true);
     }
 }

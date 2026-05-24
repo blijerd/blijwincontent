@@ -45,6 +45,10 @@ Publieke pagina's renderen SSR via Blade. Controllers blijven dun; `PageRenderSe
 
 Markdown wordt gecachet, unsafe HTML wordt gestript en links worden via CommonMark veilig verwerkt. Interne link/media resolvers zijn voorbereid als uitbreidingspunt.
 
+## SEO
+
+De XML-sitemap is beschikbaar op `/sitemap.xml`. `SitemapBuilderService` neemt alleen gepubliceerde, routeerbare en indexeerbare pagina's op en cachet de output per site. Contentwijzigingen legen de sitemap-cache via het bestaande content change event. Browsers krijgen via `/sitemap.xsl` een leesbare tabelweergave, terwijl de sitemap XML-compatible blijft voor zoekmachines.
+
 ## Admin
 
 Filament resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
@@ -134,7 +138,9 @@ Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin host
 
 De DeployHQ-configuratie kopieert repository-bestanden en draait nu geen Vite build hook. Daarom staat `public_html/build` in Git en moet `npm run build` worden gedraaid en mee gecommit bij frontendwijzigingen.
 
-DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script voert database-migraties uit met `php artisan migrate --force`, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie de release niet actief maakt.
+DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script controleert PHP 8.4+, installeert ontbrekende productie-dependencies met `composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction`, voert database-migraties uit met `php artisan migrate --force`, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie de release niet actief maakt.
+
+Selecteer op DirectAdmin PHP 8.4 of nieuwer voor `cms.vieranders.nl` en zorg dat dezelfde versie beschikbaar is voor het DeployHQ SSH command. Als de server meerdere PHP-binaries heeft, kan de hook met `PHP_BIN=/pad/naar/php84 ./scripts/deploy/post_deploy.sh` worden aangeroepen. Als Composer niet als `composer` beschikbaar is, zet dan `COMPOSER_BIN=/pad/naar/composer`.
 
 Seed login:
 

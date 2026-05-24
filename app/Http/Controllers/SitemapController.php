@@ -2,32 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Page;
 use App\Models\Site;
-use Illuminate\Contracts\Cache\Repository;
+use App\Services\Seo\SitemapBuilderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
 {
-    public function __invoke(Request $request, Repository $cache): Response
+    public function __invoke(Request $request, SitemapBuilderService $sitemap): Response
     {
-        $site = Site::query()->where('domain', $request->getHost())->first()
-            ?? Site::query()->where('is_active', true)->firstOrFail();
+        $siteForHost = Site::query()->where('domain', $request->getHost())->first();
+        abort_if($siteForHost !== null && ! $siteForHost->is_active, 404);
 
-        $xml = $cache->remember(
-            'sitemap:site:'.$site->id,
-            now()->addHour(),
-            fn (): string => view('cms.sitemap', [
-                'pages' => Page::query()
-                    ->whereBelongsTo($site)
-                    ->published()
-                    ->orderBy('locale')
-                    ->orderBy('full_path')
-                    ->get(),
-            ])->render(),
-        );
+        $site = $siteForHost ?? Site::query()->where('is_active', true)->firstOrFail();
 
-        return response($xml, 200, ['Content-Type' => 'application/xml']);
+        return response($sitemap->xmlForSite($site), 200, ['Content-Type' => 'application/xml']);
     }
 }

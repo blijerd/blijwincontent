@@ -24,9 +24,16 @@ class SeoMetadataService
     public function hreflang(Page $page): array
     {
         return $page->translations
-            ->filter(fn (Page $translation): bool => $translation->status === PageStatus::Published)
+            ->reject(fn (Page $translation): bool => $translation->is($page))
+            ->filter(fn (Page $translation): bool => $translation->is_routable && $this->isPubliclyPublished($translation))
             ->mapWithKeys(fn (Page $translation): array => [$translation->locale => url($translation->full_path)])
             ->prepend(url($page->full_path), $page->locale)
             ->all();
+    }
+
+    private function isPubliclyPublished(Page $page): bool
+    {
+        return $page->status === PageStatus::Published
+            && ($page->published_at === null || $page->published_at->lte(now()));
     }
 }

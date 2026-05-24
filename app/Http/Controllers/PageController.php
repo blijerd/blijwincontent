@@ -18,8 +18,10 @@ class PageController extends Controller
         SeoMetadataService $seo,
         ?string $path = null,
     ): View {
-        $site = Site::query()->where('domain', $request->getHost())->first()
-            ?? Site::query()->where('is_active', true)->firstOrFail();
+        $siteForHost = Site::query()->where('domain', $request->getHost())->first();
+        abort_if($siteForHost !== null && ! $siteForHost->is_active, 404);
+
+        $site = $siteForHost ?? Site::query()->where('is_active', true)->firstOrFail();
 
         $fullPath = '/'.trim((string) $path, '/');
         $fullPath = $fullPath === '/' ? '/' : rtrim($fullPath, '/');
@@ -28,6 +30,7 @@ class PageController extends Controller
             ->with(['sections.blocks.image', 'translations'])
             ->whereBelongsTo($site)
             ->where('full_path', $fullPath)
+            ->routable()
             ->published()
             ->firstOrFail();
 
