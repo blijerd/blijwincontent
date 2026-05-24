@@ -115,3 +115,7 @@ Seed login:
 ```bash
 php artisan test
 ```
+
+## Changelog
+
+Meaningful changes are tracked in `CHANGELOG.md`. Update it together with README.md when behavior, setup, architecture, database structure, admin workflows, frontend rendering or deployment changes.

@@ -34,8 +34,9 @@ The goal is to build a commercial-grade, long-lived CMS that is:
 11. Use settings/config for functional defaults; keep `.env` limited to runtime secrets and infrastructure such as database credentials.
 12. Keep the backend as the source of truth.
 13. Update README.md for significant architecture, setup or behavior changes.
-14. Add tests for migrations, rendering, SEO behavior, content services and risky admin workflows.
-15. Do not copy Blijwin OS modules one-to-one. Reuse its architecture philosophy, not its business domain implementation.
+14. Update CHANGELOG.md for every user-facing, admin-facing, architecture, database, deployment or integration-relevant change.
+15. Add tests for migrations, rendering, SEO behavior, content services and risky admin workflows.
+16. Do not copy Blijwin OS modules one-to-one. Reuse its architecture philosophy, not its business domain implementation.
 
 ---
 
@@ -399,6 +400,55 @@ The default system `php` may be older than the project requirement. Use PHP 8.4+
 
 ---
 
+## Documentation And Changelog Rules
+
+README.md and CHANGELOG.md are required project surfaces, not optional notes.
+
+Update README.md when a change affects:
+
+- setup or installation
+- deployment
+- public webroot behavior
+- architecture
+- content model
+- admin workflow
+- public frontend behavior
+- configuration or settings
+- integrations or external data sources
+
+Update CHANGELOG.md for every meaningful change that should be visible to a future developer, operator or product owner. This includes:
+
+- new features
+- changed behavior
+- database migrations
+- deployment changes
+- admin changes
+- public frontend changes
+- bug fixes
+- security or performance changes
+- removed or deprecated behavior
+
+Use the format:
+
+```md
+## Unreleased
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Fixed
+- ...
+```
+
+Keep entries short, factual and user-impact focused. Do not bury important release notes in commit messages only.
+
+Before committing, agents must check whether README.md and CHANGELOG.md need updates. If they are not updated for a meaningful change, the work is not done.
+
+---
+
 ## Frontend Rules
 
 The public website should inherit the Blijwin visual direction without copying Blijwin OS one-to-one.
@@ -475,8 +525,8 @@ A change is done when:
 - policies exist where required
 - tests pass
 - Vite build passes when frontend assets changed
-- README is updated for significant changes
+- README.md is updated when setup, architecture, admin, frontend or deployment behavior changed
+- CHANGELOG.md is updated for every meaningful change
 - migrations are production-conscious
 - deployment implications are clear
 - the work is committed and pushed when requested
-
