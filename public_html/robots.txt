@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Apache rewrites /robots.txt to Laravel so the active Site setting can
+# switch between full indexing and full blocking. This file is a static fallback.

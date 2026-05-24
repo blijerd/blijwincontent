@@ -4,6 +4,7 @@ namespace App\ViewModels;
 
 use App\Models\Page;
 use App\Services\Content\MarkdownRenderService;
+use App\Services\Content\NavigationBuilderService;
 use App\Services\Downloads\DownloadCatalogBuilderService;
 use App\Services\Faq\FaqBuilderService;
 use Illuminate\Support\Collection;
@@ -15,6 +16,7 @@ class PageViewModel
         private readonly MarkdownRenderService $markdown,
         private readonly FaqBuilderService $faqBuilder,
         private readonly DownloadCatalogBuilderService $downloadCatalogBuilder,
+        private readonly NavigationBuilderService $navigationBuilder,
     ) {}
 
     public function excerptHtml(): string
@@ -38,5 +40,17 @@ class PageViewModel
                     'body_html' => $this->markdown->render($block->body_markdown, "block:{$block->public_id}:body"),
                 ]),
             ]);
+    }
+
+    /** @return Collection<int, array<string, mixed>> */
+    public function mainNavigation(): Collection
+    {
+        return $this->navigationBuilder->build($this->page->site, $this->page->locale, 'main');
+    }
+
+    /** @return Collection<int, array<string, mixed>> */
+    public function audienceNavigation(): Collection
+    {
+        return $this->navigationBuilder->build($this->page->site, $this->page->locale, 'audience');
     }
 }

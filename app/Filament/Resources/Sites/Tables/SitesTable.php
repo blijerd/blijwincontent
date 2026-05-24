@@ -19,6 +19,13 @@ class SitesTable
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('domain')->searchable(),
                 TextColumn::make('default_locale')->sortable(),
+                TextColumn::make('search_indexing_mode')
+                    ->label('Indexering')
+                    ->formatStateUsing(fn ($state): string => $state instanceof \App\Enums\SearchIndexingMode
+                        ? $state->label()
+                        : \App\Enums\SearchIndexingMode::from($state)->label())
+                    ->badge()
+                    ->sortable(),
                 IconColumn::make('is_active')->boolean()->sortable(),
             ])
             ->filters([

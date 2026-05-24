@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Grav\ImportDeploymentGravPagesAction;
 use App\Models\Site;
 use App\Services\Grav\GravContentImportService;
 use Illuminate\Foundation\Inspiring;
@@ -24,7 +25,22 @@ Artisan::command('cms:import-grav-pages {path : Path to the Grav user/pages dire
         (string) $this->option('locale'),
     );
 
-    $this->info("Imported {$stats['pages']} pages, {$stats['sections']} sections, {$stats['blocks']} blocks and {$stats['media']} media assets.");
+    $this->info("Imported {$stats['pages']} pages, {$stats['sections']} sections, {$stats['blocks']} blocks, {$stats['media']} media assets, {$stats['menus']} menus and {$stats['menu_items']} menu items.");
 
     return 0;
 })->purpose('Import Grav pages, modules, ordering, frontmatter and media into the CMS');
+
+Artisan::command('cms:import-deployment-grav-pages {--force : Re-import even when Grav pages were imported before}', function (ImportDeploymentGravPagesAction $import): int {
+    $stats = $import->execute((bool) $this->option('force'));
+
+    if ($stats['skipped']) {
+        $this->info("Skipped deployment Grav page import: {$stats['reason']}.");
+
+        return 0;
+    }
+
+    $site = $stats['site'];
+    $this->info("Imported {$stats['pages']} pages, {$stats['sections']} sections, {$stats['blocks']} blocks, {$stats['media']} media assets, {$stats['menus']} menus and {$stats['menu_items']} menu items for {$site?->domain}.");
+
+    return 0;
+})->purpose('Import the bundled Grav page snapshot during deployment');

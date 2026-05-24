@@ -28,11 +28,32 @@
                 </span>
             </a>
 
-            <nav class="bw-site-nav" aria-label="Hoofdnavigatie">
-                <a href="{{ url('/') }}">Home</a>
-                <a href="{{ url('/blog') }}">Blog</a>
-                <a href="{{ url('/product') }}">Product</a>
-            </nav>
+            <div class="bw-header-navs">
+                @if($viewModel->audienceNavigation()->isNotEmpty())
+                    <nav class="bw-audience-nav" aria-label="Kies je menu">
+                        @foreach($viewModel->audienceNavigation() as $item)
+                            <a href="{{ $item['url'] }}">{{ $item['label'] }}</a>
+                        @endforeach
+                    </nav>
+                @endif
+
+                @if($viewModel->mainNavigation()->isNotEmpty())
+                    <nav class="bw-site-nav" aria-label="Hoofdnavigatie">
+                        @foreach($viewModel->mainNavigation() as $item)
+                            <div class="bw-site-nav__item">
+                                <a href="{{ $item['url'] }}" @if($item['opens_in_new_tab']) target="_blank" rel="noopener noreferrer" @endif>{{ $item['label'] }}</a>
+                                @if($item['children']->isNotEmpty())
+                                    <div class="bw-site-nav__submenu">
+                                        @foreach($item['children'] as $child)
+                                            <a href="{{ $child['url'] }}" @if($child['opens_in_new_tab']) target="_blank" rel="noopener noreferrer" @endif>{{ $child['label'] }}</a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </nav>
+                @endif
+            </div>
         </header>
 
         <main class="bw-page-stack">

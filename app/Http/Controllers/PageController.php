@@ -27,7 +27,7 @@ class PageController extends Controller
         $fullPath = $fullPath === '/' ? '/' : rtrim($fullPath, '/');
 
         $page = Page::query()
-            ->with(['sections.blocks.image', 'translations'])
+            ->with(['site', 'sections.blocks.image', 'translations'])
             ->whereBelongsTo($site)
             ->where('full_path', $fullPath)
             ->routable()

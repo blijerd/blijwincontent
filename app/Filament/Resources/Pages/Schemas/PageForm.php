@@ -48,6 +48,8 @@ class PageForm
                                     3000,
                                 ),
                                 TextInput::make('sort_order')->numeric()->default(0),
+                                Toggle::make('is_routable')->label('Publiek bereikbaar')->default(true),
+                                Toggle::make('is_visible_in_navigation')->label('Beschikbaar voor navigatie')->default(true),
                             ])->columns(2),
                         Tab::make('Translations')
                             ->schema([

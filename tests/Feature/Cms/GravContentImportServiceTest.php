@@ -5,7 +5,10 @@ namespace Tests\Feature\Cms;
 use App\Enums\PageStatus;
 use App\Enums\SectionType;
 use App\Enums\TemplateType;
+use App\Actions\Grav\ImportDeploymentGravPagesAction;
 use App\Models\Block;
+use App\Models\NavigationMenu;
+use App\Models\NavigationMenuItem;
 use App\Models\Page;
 use App\Models\Section;
 use App\Models\Site;
@@ -93,6 +96,8 @@ MD);
         $stats = app(GravContentImportService::class)->import($root, $site);
 
         $this->assertSame(3, $stats['pages']);
+        $this->assertSame(2, $stats['menus']);
+        $this->assertGreaterThanOrEqual(2, $stats['menu_items']);
         $this->assertSame(5, Section::count());
         $this->assertSame(5, Block::count());
 
@@ -121,5 +126,154 @@ MD);
         $this->assertSame(TemplateType::Blog, $blog->template_type);
         $this->assertSame('test', $blog->source_frontmatter['taxonomy']['tag'][0]);
         $this->assertSame('2023-04-07', $blog->published_at?->toDateString());
+
+        $audienceMenu = NavigationMenu::where('handle', 'audience')->firstOrFail();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'navigation_menu_id' => $audienceMenu->id,
+            'label' => 'Voor boekers',
+            'url' => '/',
+        ]);
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'navigation_menu_id' => $audienceMenu->id,
+            'label' => 'Voor fans',
+            'url' => '/fans',
+        ]);
+    }
+
+    public function test_it_imports_legacy_header_menu_with_submenu_items(): void
+    {
+        $root = storage_path('framework/testing/grav-navigation');
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists("{$root}/03.kinderdisco/04.camping-kinderdisco");
+
+        File::put("{$root}/03.kinderdisco/modular.md", <<<'MD'
+---
+title: Kinderdisco
+menu: Kinderdisco
+template: modular
+published: true
+visible: true
+---
+MD);
+
+        File::put("{$root}/03.kinderdisco/04.camping-kinderdisco/modular.md", <<<'MD'
+---
+title: Camping Kinderdisco
+menu: Camping
+template: modular
+published: true
+visible: true
+---
+MD);
+
+        $site = Site::factory()->create(['domain' => 'localhost']);
+
+        app(GravContentImportService::class)->import($root, $site);
+
+        $mainMenu = NavigationMenu::where('handle', 'main')->firstOrFail();
+        $mainItem = NavigationMenuItem::where('navigation_menu_id', $mainMenu->id)
+            ->where('label', 'Kinderdisco')
+            ->firstOrFail();
+
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'navigation_menu_id' => $mainMenu->id,
+            'parent_id' => $mainItem->id,
+            'label' => 'Camping',
+        ]);
+    }
+
+    public function test_deployment_import_imports_bundled_pages_and_creates_site_when_needed(): void
+    {
+        $root = storage_path('framework/testing/deployment-grav-pages');
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists("{$root}/01.home");
+        File::put("{$root}/01.home/modular.md", <<<'MD'
+---
+title: Blijwin
+template: modular
+published: true
+---
+
+Welkom.
+MD);
+
+        config()->set('settings.grav_page_import', [
+            'enabled' => true,
+            'path' => $root,
+            'locale' => 'nl',
+            'site' => null,
+            'site_domain' => 'cms.example.test',
+        ]);
+
+        $this->artisan('cms:import-deployment-grav-pages')->assertSuccessful();
+
+        $this->assertDatabaseHas('sites', [
+            'domain' => 'cms.example.test',
+            'default_locale' => 'nl',
+        ]);
+
+        $this->assertDatabaseHas('pages', [
+            'source_system' => 'grav',
+            'source_path' => '01.home/modular.md',
+            'full_path' => '/',
+        ]);
+    }
+
+    public function test_deployment_import_skips_existing_grav_pages_unless_forced(): void
+    {
+        $root = storage_path('framework/testing/deployment-grav-pages-skip');
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists("{$root}/01.home");
+        File::put("{$root}/01.home/modular.md", <<<'MD'
+---
+title: Blijwin
+template: modular
+published: true
+---
+
+Welkom.
+MD);
+
+        config()->set('settings.grav_page_import', [
+            'enabled' => true,
+            'path' => $root,
+            'locale' => 'nl',
+            'site' => null,
+            'site_domain' => 'cms.example.test',
+        ]);
+
+        $this->artisan('cms:import-deployment-grav-pages')->assertSuccessful();
+
+        $this->artisan('cms:import-deployment-grav-pages')
+            ->expectsOutput('Skipped deployment Grav page import: already_imported.')
+            ->assertSuccessful();
+
+        $this->assertSame(1, Page::query()->where('source_system', 'grav')->count());
+    }
+
+    public function test_bundled_deployment_snapshot_is_importable(): void
+    {
+        config()->set('settings.grav_page_import', [
+            'enabled' => true,
+            'path' => database_path('imports/grav-pages'),
+            'locale' => 'nl',
+            'site' => null,
+            'site_domain' => 'cms.example.test',
+        ]);
+
+        $stats = app(ImportDeploymentGravPagesAction::class)->execute(force: true);
+
+        $this->assertFalse($stats['skipped']);
+        $this->assertGreaterThan(100, $stats['pages']);
+        $this->assertGreaterThan(50, $stats['sections']);
+        $this->assertGreaterThan(50, $stats['blocks']);
+
+        $this->assertDatabaseHas('pages', [
+            'source_path' => '01.home/modular.md',
+            'full_path' => '/',
+        ]);
+        $this->assertDatabaseMissing('pages', [
+            'source_path' => 'root.md',
+        ]);
     }
 }

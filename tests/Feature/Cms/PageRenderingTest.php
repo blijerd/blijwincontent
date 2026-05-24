@@ -6,6 +6,8 @@ use App\Enums\PageStatus;
 use App\Enums\SectionType;
 use App\Enums\TemplateType;
 use App\Models\Block;
+use App\Models\NavigationMenu;
+use App\Models\NavigationMenuItem;
 use App\Models\Page;
 use App\Models\Section;
 use App\Models\Site;
@@ -38,6 +40,69 @@ class PageRenderingTest extends TestCase
             ->assertOk()
             ->assertSee('Welkom')
             ->assertSee('Intro met', false);
+    }
+
+    public function test_it_renders_admin_configured_header_navigation(): void
+    {
+        $site = Site::factory()->create(['domain' => 'localhost']);
+        $home = Page::factory()->create([
+            'site_id' => $site->id,
+            'title' => 'Home',
+            'slug' => 'home',
+            'status' => PageStatus::Published,
+        ]);
+        $parent = Page::factory()->create([
+            'site_id' => $site->id,
+            'title' => 'Kinderdisco',
+            'slug' => 'kinderdisco',
+            'status' => PageStatus::Published,
+        ]);
+        $child = Page::factory()->create([
+            'site_id' => $site->id,
+            'parent_id' => $parent->id,
+            'title' => 'Camping',
+            'slug' => 'camping',
+            'status' => PageStatus::Published,
+        ]);
+        $mainMenu = NavigationMenu::factory()->create([
+            'site_id' => $site->id,
+            'handle' => 'main',
+        ]);
+        $audienceMenu = NavigationMenu::factory()->create([
+            'site_id' => $site->id,
+            'handle' => 'audience',
+            'title' => 'Publiekskeuze',
+        ]);
+        $mainItem = NavigationMenuItem::factory()->create([
+            'navigation_menu_id' => $mainMenu->id,
+            'page_id' => $parent->id,
+            'label' => 'Kinderdisco',
+            'url' => null,
+        ]);
+        NavigationMenuItem::factory()->create([
+            'navigation_menu_id' => $mainMenu->id,
+            'parent_id' => $mainItem->id,
+            'page_id' => $child->id,
+            'label' => 'Camping',
+            'url' => null,
+        ]);
+        NavigationMenuItem::factory()->create([
+            'navigation_menu_id' => $audienceMenu->id,
+            'label' => 'Voor boekers',
+            'url' => '/',
+        ]);
+        NavigationMenuItem::factory()->create([
+            'navigation_menu_id' => $audienceMenu->id,
+            'label' => 'Voor fans',
+            'url' => '/fans',
+        ]);
+
+        $this->get($home->full_path)
+            ->assertOk()
+            ->assertSee('Voor boekers')
+            ->assertSee('Voor fans')
+            ->assertSee('Kinderdisco')
+            ->assertSee('Camping');
     }
 
     public function test_it_does_not_render_pages_for_inactive_sites(): void

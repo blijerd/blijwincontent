@@ -2,6 +2,7 @@
 
 namespace App\Services\Seo;
 
+use App\Enums\SearchIndexingMode;
 use App\Models\Page;
 use App\Models\Site;
 use Illuminate\Contracts\Cache\Repository;
@@ -16,10 +17,12 @@ class SitemapBuilderService
     public function xmlForSite(Site $site): string
     {
         return $this->cache->remember(
-            'sitemap:site:'.$site->id,
+            'sitemap:site:'.$site->id.':indexing:'.$site->search_indexing_mode->value,
             now()->addHour(),
             fn (): string => view('cms.sitemap', [
-                'pages' => $this->pagesForSite($site),
+                'pages' => $site->search_indexing_mode === SearchIndexingMode::Noindex
+                    ? collect()
+                    : $this->pagesForSite($site),
             ])->render(),
         );
     }

@@ -8,6 +8,10 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Added
 
+- Added relational navigation menus and menu items with Filament resources for the public header, submenu items and the `Voor boekers` / `Voor fans` switcher.
+- Added GRAV navigation import that creates the legacy header menu and audience switcher during page imports.
+- Added a per-site search indexing mode that can fully allow indexing or block indexing through dynamic `robots.txt`, sitemap output, meta robots and `X-Robots-Tag` headers.
+- Added a bundled Markdown/YAML GRAV page snapshot and deployment import command that runs from the DeployHQ post-deploy hook.
 - Added a `/setup` bootstrap flow for creating the first CMS administrator when no users exist yet.
 - Added a cached `/sitemap.xml` endpoint that lists published, routable and indexable pages per site.
 - Added browser-friendly XSL styling for `/sitemap.xml`.
@@ -20,6 +24,8 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Changed
 
+- Changed the public header to render admin-configured navigation instead of hardcoded links.
+- Changed the admin login bootstrap behavior so `/admin` and `/admin/login` redirect to `/setup` while no CMS user exists.
 - Clarified the DirectAdmin/DeployHQ target path documentation so deployments place the Laravel app beside `public_html` instead of inside it.
 - Changed the DeployHQ post-deploy hook to run Composer through the selected PHP binary so production dependency installs respect the PHP 8.4 requirement.
 - Changed the DeployHQ post-deploy hook to verify PHP 8.4+ and install missing production Composer dependencies before running Laravel deployment commands.

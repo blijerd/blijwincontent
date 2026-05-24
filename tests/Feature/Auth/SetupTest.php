@@ -19,6 +19,15 @@ class SetupTest extends TestCase
             ->assertSee('Eerste beheerder aanmaken');
     }
 
+    public function test_admin_login_redirects_to_setup_when_no_user_exists(): void
+    {
+        $this->get('/admin')
+            ->assertRedirect('/setup');
+
+        $this->get('/admin/login')
+            ->assertRedirect('/setup');
+    }
+
     public function test_setup_creates_first_user_and_logs_in(): void
     {
         $response = $this->post('/setup', [
@@ -49,6 +58,14 @@ class SetupTest extends TestCase
         User::factory()->create();
 
         $this->get('/setup')->assertRedirect('/admin');
+    }
+
+    public function test_admin_login_is_available_when_a_user_exists(): void
+    {
+        User::factory()->create();
+
+        $this->get('/admin/login')
+            ->assertOk();
     }
 
     public function test_setup_refuses_to_create_another_user(): void

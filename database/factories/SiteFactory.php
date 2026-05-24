@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\SearchIndexingMode;
 use App\Models\Site;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,7 @@ class SiteFactory extends Factory
             'default_locale' => 'nl',
             'available_locales' => ['nl', 'en'],
             'is_active' => true,
+            'search_indexing_mode' => SearchIndexingMode::Index,
         ];
     }
 }

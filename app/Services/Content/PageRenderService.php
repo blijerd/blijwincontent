@@ -13,6 +13,7 @@ class PageRenderService
         private readonly MarkdownRenderService $markdown,
         private readonly FaqBuilderService $faqBuilder,
         private readonly DownloadCatalogBuilderService $downloadCatalogBuilder,
+        private readonly NavigationBuilderService $navigationBuilder,
     ) {}
 
     public function viewModel(Page $page): PageViewModel
@@ -26,6 +27,6 @@ class PageRenderService
             'translations',
         ]);
 
-        return new PageViewModel($page, $this->markdown, $this->faqBuilder, $this->downloadCatalogBuilder);
+        return new PageViewModel($page, $this->markdown, $this->faqBuilder, $this->downloadCatalogBuilder, $this->navigationBuilder);
     }
 }

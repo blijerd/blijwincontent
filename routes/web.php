@@ -4,6 +4,7 @@ use App\Http\Controllers\Downloads\DownloadDirectController;
 use App\Http\Controllers\Downloads\DownloadSecureController;
 use App\Http\Controllers\Downloads\DownloadSecureRequestController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\RobotsTxtController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\TrackingCollectController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\TrackingConsentController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/robots.txt', RobotsTxtController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/setup', [SetupController::class, 'show'])->name('setup.show');
 Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');

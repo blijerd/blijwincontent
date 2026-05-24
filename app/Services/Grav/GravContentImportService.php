@@ -8,6 +8,8 @@ use App\Enums\SectionType;
 use App\Enums\TemplateType;
 use App\Models\Block;
 use App\Models\MediaAsset;
+use App\Models\NavigationMenu;
+use App\Models\NavigationMenuItem;
 use App\Models\Page;
 use App\Models\Section;
 use App\Models\Site;
@@ -22,7 +24,7 @@ class GravContentImportService
 {
     private const SOURCE_SYSTEM = 'grav';
 
-    /** @return array{pages: int, sections: int, blocks: int, media: int} */
+    /** @return array{pages: int, sections: int, blocks: int, media: int, menus: int, menu_items: int} */
     public function import(string $pagesPath, Site $site, string $locale = 'nl'): array
     {
         $root = rtrim(realpath($pagesPath) ?: $pagesPath, DIRECTORY_SEPARATOR);
@@ -32,7 +34,7 @@ class GravContentImportService
         }
 
         return DB::transaction(function () use ($root, $site, $locale): array {
-            $stats = ['pages' => 0, 'sections' => 0, 'blocks' => 0, 'media' => 0];
+            $stats = ['pages' => 0, 'sections' => 0, 'blocks' => 0, 'media' => 0, 'menus' => 0, 'menu_items' => 0];
             $pagesByDirectory = [];
 
             foreach ($this->pageMarkdownFiles($root) as $file) {
@@ -57,6 +59,10 @@ class GravContentImportService
                 $stats['media'] += $this->upsertMediaForDirectory($file->getPath(), $root, $this->relativePath($file->getPathname(), $root), $locale);
             }
 
+            $menuStats = $this->upsertNavigationMenus($site, $locale);
+            $stats['menus'] = $menuStats['menus'];
+            $stats['menu_items'] = $menuStats['menu_items'];
+
             return $stats;
         });
     }
@@ -66,7 +72,7 @@ class GravContentImportService
     {
         return array_values(array_filter(
             $this->markdownFiles($root),
-            fn (SplFileInfo $file): bool => ! $this->isModuleDirectory($file->getPath()),
+            fn (SplFileInfo $file): bool => ! $this->isRootMetadataFile($file, $root) && ! $this->isModuleDirectory($file->getPath()),
         ));
     }
 
@@ -348,6 +354,11 @@ class GravContentImportService
         return $this->folderParts(basename($directory))['is_module'];
     }
 
+    private function isRootMetadataFile(SplFileInfo $file, string $root): bool
+    {
+        return $file->getPath() === $root && $file->getFilename() === 'root.md';
+    }
+
     private function nearestImportedPage(string $directory, string $root, array $pagesByDirectory): ?Page
     {
         $current = $directory;
@@ -432,6 +443,179 @@ class GravContentImportService
         $metadata = Yaml::parseFile($metaPath) ?: [];
 
         return is_array($metadata) ? $metadata : [];
+    }
+
+    /** @return array{menus: int, menu_items: int} */
+    private function upsertNavigationMenus(Site $site, string $locale): array
+    {
+        $main = NavigationMenu::query()->updateOrCreate(
+            [
+                'site_id' => $site->id,
+                'locale' => $locale,
+                'handle' => 'main',
+            ],
+            [
+                'title' => 'Hoofdmenu',
+                'is_active' => true,
+                'source_system' => self::SOURCE_SYSTEM,
+                'source_path' => 'legacy-header:main',
+            ],
+        );
+
+        $audience = NavigationMenu::query()->updateOrCreate(
+            [
+                'site_id' => $site->id,
+                'locale' => $locale,
+                'handle' => 'audience',
+            ],
+            [
+                'title' => 'Publiekskeuze',
+                'is_active' => true,
+                'source_system' => self::SOURCE_SYSTEM,
+                'source_path' => 'legacy-header:audience',
+            ],
+        );
+
+        return [
+            'menus' => 2,
+            'menu_items' => $this->upsertMainMenuItems($main, $site, $locale)
+                + $this->upsertAudienceMenuItems($audience),
+        ];
+    }
+
+    private function upsertMainMenuItems(NavigationMenu $menu, Site $site, string $locale): int
+    {
+        $pages = Page::query()
+            ->whereBelongsTo($site)
+            ->where('locale', $locale)
+            ->where('source_system', self::SOURCE_SYSTEM)
+            ->with('children')
+            ->get()
+            ->keyBy('full_path');
+
+        $items = [
+            ['label' => 'Kinderdisco', 'path' => '/kinderdisco'],
+            ['label' => 'Kinderfeestje', 'path' => '/kinderdisco-kinderfeestje'],
+            ['label' => 'Schoolfeest', 'path' => '/schoolfeest'],
+            ['label' => 'Groep 8 Disco', 'path' => '/schoolfeest/groep-8-eindfeest'],
+            ['label' => 'Schuimparty', 'path' => '/schuimparty'],
+            ['label' => 'Boeken', 'path' => '/contact'],
+        ];
+
+        $seen = [];
+        $count = 0;
+
+        foreach ($items as $index => $item) {
+            $page = $pages->get($item['path']);
+            $sourcePath = 'legacy-header:main:'.$item['path'];
+            $seen[] = $sourcePath;
+
+            $menuItem = NavigationMenuItem::query()->updateOrCreate(
+                [
+                    'navigation_menu_id' => $menu->id,
+                    'source_system' => self::SOURCE_SYSTEM,
+                    'source_path' => $sourcePath,
+                ],
+                [
+                    'parent_id' => null,
+                    'page_id' => $page?->id,
+                    'label' => $item['label'],
+                    'url' => $page ? null : $item['path'],
+                    'sort_order' => ($index + 1) * 10,
+                    'is_visible' => true,
+                    'opens_in_new_tab' => false,
+                    'source_key' => $item['path'],
+                ],
+            );
+
+            $count++;
+            $count += $this->upsertSubmenuItems($menu, $menuItem, $page, $seen);
+        }
+
+        NavigationMenuItem::query()
+            ->whereBelongsTo($menu, 'menu')
+            ->where('source_system', self::SOURCE_SYSTEM)
+            ->whereNotIn('source_path', $seen)
+            ->delete();
+
+        return $count;
+    }
+
+    /** @param list<string> $seen */
+    private function upsertSubmenuItems(NavigationMenu $menu, NavigationMenuItem $parentItem, ?Page $page, array &$seen): int
+    {
+        if (! $page) {
+            return 0;
+        }
+
+        $count = 0;
+
+        foreach ($page->children->where('is_visible_in_navigation', true)->where('is_routable', true)->values() as $index => $child) {
+            $sourcePath = 'legacy-header:main:'.$page->full_path.':'.$child->full_path;
+            $seen[] = $sourcePath;
+
+            NavigationMenuItem::query()->updateOrCreate(
+                [
+                    'navigation_menu_id' => $menu->id,
+                    'source_system' => self::SOURCE_SYSTEM,
+                    'source_path' => $sourcePath,
+                ],
+                [
+                    'parent_id' => $parentItem->id,
+                    'page_id' => $child->id,
+                    'label' => (string) ($child->source_frontmatter['menu'] ?? $child->title),
+                    'url' => null,
+                    'sort_order' => ($index + 1) * 10,
+                    'is_visible' => true,
+                    'opens_in_new_tab' => false,
+                    'source_key' => $child->full_path,
+                ],
+            );
+
+            $count++;
+        }
+
+        return $count;
+    }
+
+    private function upsertAudienceMenuItems(NavigationMenu $menu): int
+    {
+        $items = [
+            ['label' => 'Voor boekers', 'url' => '/'],
+            ['label' => 'Voor fans', 'url' => '/fans'],
+        ];
+        $seen = [];
+
+        foreach ($items as $index => $item) {
+            $sourcePath = 'legacy-header:audience:'.$item['url'];
+            $seen[] = $sourcePath;
+
+            NavigationMenuItem::query()->updateOrCreate(
+                [
+                    'navigation_menu_id' => $menu->id,
+                    'source_system' => self::SOURCE_SYSTEM,
+                    'source_path' => $sourcePath,
+                ],
+                [
+                    'parent_id' => null,
+                    'page_id' => null,
+                    'label' => $item['label'],
+                    'url' => $item['url'],
+                    'sort_order' => ($index + 1) * 10,
+                    'is_visible' => true,
+                    'opens_in_new_tab' => false,
+                    'source_key' => $item['url'],
+                ],
+            );
+        }
+
+        NavigationMenuItem::query()
+            ->whereBelongsTo($menu, 'menu')
+            ->where('source_system', self::SOURCE_SYSTEM)
+            ->whereNotIn('source_path', $seen)
+            ->delete();
+
+        return count($items);
     }
 
     private function relativePath(string $path, string $root): string

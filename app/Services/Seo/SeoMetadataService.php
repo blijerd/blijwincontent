@@ -2,6 +2,7 @@
 
 namespace App\Services\Seo;
 
+use App\Enums\SearchIndexingMode;
 use App\Enums\PageStatus;
 use App\Models\Page;
 
@@ -10,13 +11,19 @@ class SeoMetadataService
     /** @return array<string, string|null> */
     public function forPage(Page $page): array
     {
+        if ($page->site?->search_indexing_mode === SearchIndexingMode::Noindex) {
+            $robots = SearchIndexingMode::Noindex->robotsMeta();
+        } else {
+            $robots = ($page->robots_index ? 'index' : 'noindex').','.($page->robots_follow ? 'follow' : 'nofollow');
+        }
+
         return [
             'title' => $page->seo_title ?: $page->title,
             'description' => $page->seo_description,
             'canonical' => $page->canonical_url ?: url($page->full_path),
             'og_title' => $page->og_title ?: $page->seo_title ?: $page->title,
             'og_description' => $page->og_description ?: $page->seo_description,
-            'robots' => ($page->robots_index ? 'index' : 'noindex').','.($page->robots_follow ? 'follow' : 'nofollow'),
+            'robots' => $robots,
         ];
     }
 

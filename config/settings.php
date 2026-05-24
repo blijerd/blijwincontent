@@ -117,6 +117,14 @@ return [
         ],
     ],
 
+    'grav_page_import' => [
+        'enabled' => true,
+        'path' => 'database/imports/grav-pages',
+        'locale' => 'nl',
+        'site' => null,
+        'site_domain' => 'cms.vieranders.nl',
+    ],
+
     'downloads' => [
         'routes' => [
             'direct' => '/downloads/file',

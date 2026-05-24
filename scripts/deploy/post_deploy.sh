@@ -29,6 +29,7 @@ if [ ! -f "vendor/autoload.php" ]; then
 fi
 
 "$PHP_BIN" artisan migrate --force
+"$PHP_BIN" artisan cms:import-deployment-grav-pages
 "$PHP_BIN" artisan storage:link --force
 "$PHP_BIN" artisan config:cache
 "$PHP_BIN" artisan route:cache

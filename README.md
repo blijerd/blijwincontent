@@ -20,6 +20,7 @@ Zelfstandig Laravel 12 + Filament 4 CMS voor markdown-first contentbeheer. Dit p
 - `Redirect`: locale-specifieke redirects.
 - `FaqCategory` en `FaqItem`: centrale veelgestelde vragen, koppelbaar aan FAQ-secties.
 - `DownloadCategory`, `DownloadItem` en `DownloadFormat`: centrale downloadcatalogus, koppelbaar aan downloads-secties.
+- `NavigationMenu` en `NavigationMenuItem`: relationele hoofdmenu's, publiekskeuzes en submenu-items per site en locale.
 - `ActivityLog`: basis voor audit trail.
 
 Er is bewust geen generieke JSON pagebuilder. Markdown content staat in expliciete velden en structuur staat relationeel in MySQL.
@@ -34,10 +35,11 @@ De structuur kan later gemapt worden vanuit GRAV:
 - modular content naar `blocks`
 - markdown body naar Markdown velden
 - media naast pagina's naar `media_assets`
+- GRAV `menu` en `visible` metadata naar beheerbare navigatie-items
 - redirects naar `redirects`
 - vertaalde pagina's naar gedeelde `translation_group_id`
 
-De importer zelf is nog niet gebouwd.
+De eerste GRAV pagina-import is beschikbaar via `cms:import-grav-pages` en de deployment-snapshot in `database/imports/grav-pages`. Die snapshot bevat Markdown en YAML metadata uit de bestaande GRAV `pages` map, maar bewust geen zware binaire media. De import maakt ook het hoofdmenu, submenu's en de header-switcher `Voor boekers` / `Voor fans` aan als relationele menu's. De DeployHQ post-deploy hook draait `cms:import-deployment-grav-pages` eenmalig zodra er nog geen GRAV-pagina's voor de doelsite bestaan. De import is idempotent op `source_system` en `source_path`; handmatig opnieuw importeren kan met `php artisan cms:import-deployment-grav-pages --force`.
 
 ## Rendering
 
@@ -49,9 +51,11 @@ Markdown wordt gecachet, unsafe HTML wordt gestript en links worden via CommonMa
 
 De XML-sitemap is beschikbaar op `/sitemap.xml`. `SitemapBuilderService` neemt alleen gepubliceerde, routeerbare en indexeerbare pagina's op en cachet de output per site. Contentwijzigingen legen de sitemap-cache via het bestaande content change event. Browsers krijgen via `/sitemap.xsl` een leesbare tabelweergave, terwijl de sitemap XML-compatible blijft voor zoekmachines.
 
+Per site is in Filament instelbaar of zoekmachines maximaal mogen indexeren of juist niets mogen indexeren. Bij maximale indexering geeft `/robots.txt` alle crawlers toegang en verwijst naar `/sitemap.xml`. Bij blokkeren geeft `/robots.txt` `Disallow: /`, blijven sitemap-URL's leeg en zet de applicatie `noindex,nofollow` meta plus een `X-Robots-Tag: noindex, nofollow, noarchive` header op responses. Apache herschrijft `/robots.txt` via `public_html/.htaccess` naar Laravel zodat deze instelling per domein actief is.
+
 ## Admin
 
-Filament resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
+Filament resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects, menu's, menu-items en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Het publieke hoofdmenu gebruikt de menu resource met handle `main`; de header-switcher gebruikt handle `audience`. Submenu's zijn gewone menu-items met een parent menu-item. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
 
 ## Tracking
 
@@ -111,6 +115,8 @@ Functionele defaults staan in `config/settings.php` onder `blijwinos`. De write 
 
 Functionele applicatie-instellingen staan zoveel mogelijk in `config/settings.php`, niet in `.env`. Denk aan appnaam, publieke URL, locales, cache, queue, session, logging, mail defaults en filesystem defaults.
 
+Zoekmachine-indexering is een expliciete site-instelling in de database, omdat dit per domein kan verschillen. Gebruik de Site-resource in Filament om tussen `Maximaal indexeren` en `Niets indexeren` te wisselen.
+
 `.env` blijft bedoeld voor runtime en infrastructuur:
 
 - `APP_ENV`, `APP_DEBUG`, `APP_KEY` en eventuele previous keys
@@ -132,7 +138,7 @@ npm run build
 php artisan serve
 ```
 
-Setup: `/setup` zolang er nog geen beheerder bestaat.
+Setup: `/setup` zolang er nog geen beheerder bestaat. `/admin` en `/admin/login` sturen in die situatie ook door naar de setup.
 
 Admin: `/admin`
 
@@ -140,7 +146,7 @@ Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin host
 
 De DeployHQ-configuratie kopieert repository-bestanden en draait nu geen Vite build hook. Daarom staat `public_html/build` in Git en moet `npm run build` worden gedraaid en mee gecommit bij frontendwijzigingen.
 
-DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script controleert PHP 8.4+, installeert ontbrekende productie-dependencies met `composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction` via dezelfde PHP-binary, voert database-migraties uit met `php artisan migrate --force`, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie de release niet actief maakt.
+DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script controleert PHP 8.4+, installeert ontbrekende productie-dependencies met `composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction` via dezelfde PHP-binary, voert database-migraties uit met `php artisan migrate --force`, importeert de gebundelde GRAV-pagina snapshot wanneer die nog niet eerder is geimporteerd, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie of import de release niet actief maakt.
 
 Selecteer op DirectAdmin PHP 8.4 of nieuwer voor `cms.vieranders.nl` en zorg dat dezelfde versie beschikbaar is voor het DeployHQ SSH command. Als de server meerdere PHP-binaries heeft, kan de hook met `PHP_BIN=/pad/naar/php84 ./scripts/deploy/post_deploy.sh` worden aangeroepen. Als Composer niet als `composer` beschikbaar is, zet dan `COMPOSER_BIN=/pad/naar/composer`. Een Apache/LSAPI log met `include_path='.:/opt/alt/php83/...` betekent dat de site nog op PHP 8.3 draait en niet aan de projectvereiste voldoet.
 
