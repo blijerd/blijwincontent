@@ -55,7 +55,7 @@ Per site is in Filament instelbaar of zoekmachines maximaal mogen indexeren of j
 
 ## Admin
 
-Filament resources zijn gegroepeerd in CMS-beheergebieden voor content, structuur, media, downloads, SEO/beheer en tracking. Resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects, menu's, menu-items en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. Het publieke hoofdmenu gebruikt de menu resource met handle `main`; de header-switcher gebruikt handle `audience`. Submenu's zijn gewone menu-items met een parent menu-item. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
+Filament resources zijn gegroepeerd in CMS-beheergebieden voor content, structuur, media, downloads, SEO/beheer en tracking. Resources zijn aanwezig voor sites, pages, sections, blocks, media assets, redirects, menu's, menu-items en tracking visitors. De eerste versie bevat Markdown editor, locale/status/template filters, SEO velden en relationele selectors. De parent-keuze van pagina's gebruikt een zoekbare modaltabel zodat grote pagina-overzichten filterbaar blijven. Het publieke hoofdmenu gebruikt de menu resource met handle `main`; de header-switcher gebruikt handle `audience`. Submenu's zijn gewone menu-items met een parent menu-item. Page tree en drag/drop sorting zijn voorbereid via parent/sort_order en kunnen als custom Filament page verder worden verfijnd.
 
 ## Tracking
 

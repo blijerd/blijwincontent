@@ -4,9 +4,12 @@ namespace App\Filament\Resources\Pages\Schemas;
 
 use App\Enums\PageStatus;
 use App\Enums\TemplateType;
+use App\Filament\Resources\Pages\Tables\PageParentSelectTable;
 use App\Models\Page;
 use App\Support\Filament\CmsMarkdownEditor;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\ModalTableSelect;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -26,10 +29,18 @@ class PageForm
                         Tab::make('Content')
                             ->schema([
                                 Select::make('site_id')->relationship('site', 'name')->required(),
-                                Select::make('parent_id')
+                                ModalTableSelect::make('parent_id')
+                                    ->label('Bovenliggende pagina')
+                                    ->placeholder('Geen bovenliggende pagina')
                                     ->relationship('parent', 'title')
-                                    ->searchable()
-                                    ->preload(),
+                                    ->tableConfiguration(PageParentSelectTable::class)
+                                    ->getOptionLabelFromRecordUsing(fn (Page $record): string => $record->full_path ?: $record->title)
+                                    ->selectAction(
+                                        fn (Action $action): Action => $action
+                                            ->label('Pagina kiezen')
+                                            ->modalHeading('Kies bovenliggende pagina')
+                                            ->modalSubmitActionLabel('Kiezen'),
+                                    ),
                                 TextInput::make('locale')->required()->default('nl')->maxLength(12),
                                 TextInput::make('title')->required()->maxLength(255),
                                 TextInput::make('slug')->maxLength(255),
