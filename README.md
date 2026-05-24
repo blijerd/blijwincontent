@@ -130,8 +130,12 @@ Seed login:
 ## Tests
 
 ```bash
-php artisan test
+composer test:dev
+composer test:fast
+composer test:full
 ```
+
+De volledige test-set staat in `docs/test-set.md`. Gebruik gerichte profielen zoals `composer test:downloads`, `composer test:faq`, `composer test:tracking` en `composer test:content` tijdens featurewerk.
 
 ## Changelog
 

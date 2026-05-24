@@ -111,6 +111,7 @@ Target structure:
 ├── public_html/
 ├── resources/
 ├── routes/
+├── scripts/
 ├── storage/
 ├── tests/
 ├── README.md
