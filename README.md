@@ -120,6 +120,8 @@ Admin: `/admin`
 
 Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin hosting.
 
+De DeployHQ-configuratie kopieert repository-bestanden en draait nu geen Vite build hook. Daarom staat `public_html/build` in Git en moet `npm run build` worden gedraaid en mee gecommit bij frontendwijzigingen.
+
 Seed login:
 
 - Email: `admin@example.com`

@@ -1,0 +1,54 @@
+{
+  "resources/brand/fonts/Grandstander-Bold-critical.woff2": {
+    "file": "assets/Grandstander-Bold-critical-BBbKP8LW.woff2",
+    "src": "resources/brand/fonts/Grandstander-Bold-critical.woff2"
+  },
+  "resources/brand/fonts/Grandstander-Regular-critical.woff2": {
+    "file": "assets/Grandstander-Regular-critical-zn6WchZE.woff2",
+    "src": "resources/brand/fonts/Grandstander-Regular-critical.woff2"
+  },
+  "resources/brand/fonts/Nunito-Latin-Italic-Variable.woff2": {
+    "file": "assets/Nunito-Latin-Italic-Variable-Qd_YXi8n.woff2",
+    "src": "resources/brand/fonts/Nunito-Latin-Italic-Variable.woff2"
+  },
+  "resources/brand/fonts/Nunito-Latin-Variable.woff2": {
+    "file": "assets/Nunito-Latin-Variable-CjueodBP.woff2",
+    "src": "resources/brand/fonts/Nunito-Latin-Variable.woff2"
+  },
+  "resources/brand/images/bg-patroonsterren.webp": {
+    "file": "assets/bg-patroonsterren-DjPsj0NQ.webp",
+    "src": "resources/brand/images/bg-patroonsterren.webp"
+  },
+  "resources/brand/images/blijwin-komeet.png": {
+    "file": "assets/blijwin-komeet-D6EDQ4Cv.png",
+    "src": "resources/brand/images/blijwin-komeet.png"
+  },
+  "resources/brand/images/blijwin25.avif": {
+    "file": "assets/blijwin25-Dwqnllh2.avif",
+    "src": "resources/brand/images/blijwin25.avif"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CzBbTriO.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-BbF6m7x4.css",
+    "src": "resources/css/filament/admin/theme.css",
+    "isEntry": true,
+    "name": "theme",
+    "names": [
+      "theme.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Z179L0J7.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

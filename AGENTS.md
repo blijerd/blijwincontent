@@ -81,6 +81,8 @@ The application must run on DirectAdmin-style hosting with:
 
 Laravel must use `public_html` as public path. Vite must build assets into `public_html/build`.
 
+The current DeployHQ project transfers repository files and does not run a Vite build hook. Keep `public_html/build` committed after frontend changes unless deployment automation is changed to build assets server-side.
+
 Production deployment should be automated through DeployHQ. If migrations or build steps are needed, they belong in deployment hooks or documented release automation, not in undocumented manual steps.
 
 ---
