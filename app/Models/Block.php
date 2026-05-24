@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\BlockType;
 use App\Events\ContentChanged;
+use Database\Factories\BlockFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Block extends Model
 {
-    /** @use HasFactory<\Database\Factories\BlockFactory> */
+    /** @use HasFactory<BlockFactory> */
     use HasFactory;
+
     use HasUuids;
 
     protected $fillable = [
@@ -26,6 +28,10 @@ class Block extends Model
         'button_label',
         'button_url',
         'image_id',
+        'source_system',
+        'source_path',
+        'source_key',
+        'source_payload',
     ];
 
     public function uniqueIds(): array
@@ -37,6 +43,7 @@ class Block extends Model
     {
         return [
             'type' => BlockType::class,
+            'source_payload' => 'array',
         ];
     }
 

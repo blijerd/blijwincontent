@@ -38,6 +38,12 @@ class Section extends Model
         'downloads_secure_enabled',
         'sort_order',
         'is_visible',
+        'source_system',
+        'source_path',
+        'source_folder',
+        'source_template',
+        'source_order_prefix',
+        'source_frontmatter',
     ];
 
     public function uniqueIds(): array
@@ -58,6 +64,8 @@ class Section extends Model
             'faq_initial_limit' => 'integer',
             'downloads_show_category_intro' => 'boolean',
             'downloads_secure_enabled' => 'boolean',
+            'source_order_prefix' => 'integer',
+            'source_frontmatter' => 'array',
         ];
     }
 

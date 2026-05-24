@@ -134,6 +134,8 @@ Webroot: `public_html/`, gelijk aan Blijwin OS en geschikt voor DirectAdmin host
 
 De DeployHQ-configuratie kopieert repository-bestanden en draait nu geen Vite build hook. Daarom staat `public_html/build` in Git en moet `npm run build` worden gedraaid en mee gecommit bij frontendwijzigingen.
 
+DeployHQ draait voor zero-downtime releases het SSH command `cd %path% && ./scripts/deploy/post_deploy.sh` voordat de release actief wordt. Dit script voert database-migraties uit met `php artisan migrate --force`, maakt de publieke storage-link aan en bouwt Laravel caches opnieuw op. Zet "Stop the deployment if the command fails" aan, zodat een mislukte migratie de release niet actief maakt.
+
 Seed login:
 
 - Email: `admin@example.com`

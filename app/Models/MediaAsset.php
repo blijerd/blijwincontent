@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MediaAssetFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,8 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaAsset extends Model
 {
-    /** @use HasFactory<\Database\Factories\MediaAssetFactory> */
+    /** @use HasFactory<MediaAssetFactory> */
     use HasFactory;
+
     use HasUuids;
 
     protected $fillable = [
@@ -25,11 +27,22 @@ class MediaAsset extends Model
         'height',
         'alt_text',
         'locale',
+        'source_system',
+        'source_path',
+        'source_page_path',
+        'source_metadata',
     ];
 
     public function uniqueIds(): array
     {
         return ['public_id'];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'source_metadata' => 'array',
+        ];
     }
 
     public function blocks(): HasMany

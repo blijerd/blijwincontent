@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Actions\Content\PreparePageForSaveAction;
 use App\Enums\PageStatus;
 use App\Enums\TemplateType;
-use App\Actions\Content\PreparePageForSaveAction;
 use App\Events\ContentChanged;
+use Database\Factories\PageFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,8 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Page extends Model
 {
-    /** @use HasFactory<\Database\Factories\PageFactory> */
+    /** @use HasFactory<PageFactory> */
     use HasFactory;
+
     use HasUuids;
 
     protected $fillable = [
@@ -40,6 +42,14 @@ class Page extends Model
         'canonical_url',
         'robots_index',
         'robots_follow',
+        'source_system',
+        'source_path',
+        'source_folder',
+        'source_template',
+        'source_order_prefix',
+        'source_frontmatter',
+        'is_routable',
+        'is_visible_in_navigation',
     ];
 
     public function uniqueIds(): array
@@ -55,6 +65,10 @@ class Page extends Model
             'published_at' => 'datetime',
             'robots_index' => 'boolean',
             'robots_follow' => 'boolean',
+            'source_order_prefix' => 'integer',
+            'source_frontmatter' => 'array',
+            'is_routable' => 'boolean',
+            'is_visible_in_navigation' => 'boolean',
         ];
     }
 
