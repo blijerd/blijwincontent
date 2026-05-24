@@ -19,6 +19,7 @@ Zelfstandig Laravel 12 + Filament 4 CMS voor markdown-first contentbeheer. Dit p
 - `MediaAsset`: media naast content, passend bij latere GRAV page-folder mapping.
 - `Redirect`: locale-specifieke redirects.
 - `FaqCategory` en `FaqItem`: centrale veelgestelde vragen, koppelbaar aan FAQ-secties.
+- `DownloadCategory`, `DownloadItem` en `DownloadFormat`: centrale downloadcatalogus, koppelbaar aan downloads-secties.
 - `ActivityLog`: basis voor audit trail.
 
 Er is bewust geen generieke JSON pagebuilder. Markdown content staat in expliciete velden en structuur staat relationeel in MySQL.
@@ -75,6 +76,20 @@ De kern van de oude GRAV `veelgestelde-vragen` plugin is relationeel overgezet:
 - importservice voor latere extractie uit JSON-LD en Markdown headings
 
 De volledige GRAV-import UI is bewust nog niet gebouwd; de services bereiden die stap wel voor.
+
+## Downloads
+
+De kern van de oude GRAV `downloads` plugin is relationeel overgezet:
+
+- centrale downloadcategorieen, downloaditems en formats in Filament
+- downloads-secties kunnen categorieen hergebruiken
+- Markdown-intro's en previewteksten met veilige rendering en caching
+- previewafbeeldingen via `MediaAsset`
+- primaire downloadknop met alternatieve formats
+- directe public-disk downloads via `/downloads/file/{category}/{item}/{format}`
+- beveiligde downloads met voornaam/e-mail modal, honeypot, minimale invultijd, rate limiting, tijdelijke tokenlinks en mail logs
+
+De bestaande GRAV YAML-import is bewust nog niet gebouwd. De relationele structuur sluit wel aan op GRAV downloads-categorieen, preview images, formats en secure delivery.
 
 ## Settings
 

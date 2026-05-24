@@ -34,6 +34,8 @@ class Section extends Model
         'faq_initial_limit',
         'faq_cta_label',
         'faq_cta_url',
+        'downloads_show_category_intro',
+        'downloads_secure_enabled',
         'sort_order',
         'is_visible',
     ];
@@ -54,6 +56,8 @@ class Section extends Model
             'faq_expand_first' => 'boolean',
             'faq_allow_multiple_open' => 'boolean',
             'faq_initial_limit' => 'integer',
+            'downloads_show_category_intro' => 'boolean',
+            'downloads_secure_enabled' => 'boolean',
         ];
     }
 
@@ -76,5 +80,10 @@ class Section extends Model
     public function faqCategories(): BelongsToMany
     {
         return $this->belongsToMany(FaqCategory::class)->withTimestamps();
+    }
+
+    public function downloadCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(DownloadCategory::class)->withTimestamps();
     }
 }

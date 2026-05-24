@@ -12,5 +12,6 @@ enum SectionType: string
     case RichText = 'rich_text';
     case Cta = 'cta';
     case Faq = 'faq';
+    case Downloads = 'downloads';
     case Video = 'video';
 }

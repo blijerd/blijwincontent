@@ -116,4 +116,28 @@ return [
             ],
         ],
     ],
+
+    'downloads' => [
+        'routes' => [
+            'direct' => '/downloads/file',
+            'secure_request' => '/downloads/api/request-email',
+            'secure_delivery' => '/downloads/secure',
+        ],
+        'secure' => [
+            'enabled' => true,
+            'token_ttl_hours' => 48,
+            'honeypot_field' => 'website_url',
+            'form_token_session_key' => 'download_secure_form_tokens',
+            'min_submit_seconds' => 4,
+            'rate_limits' => [
+                'per_minute' => 2,
+                'per_hour' => 6,
+            ],
+            'mail_subject' => 'Je download van Blijwin staat klaar',
+        ],
+        'presentation' => [
+            'open_external_in_new_tab' => true,
+            'download_local_files' => true,
+        ],
+    ],
 ];

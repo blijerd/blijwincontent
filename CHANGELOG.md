@@ -8,5 +8,5 @@ This project uses an `Unreleased` section so upcoming work is visible before a t
 
 ### Added
 
+- Added relational downloads functionality with categories, items, formats, secure e-mail token delivery, frontend rendering and Filament resources.
 - Added project documentation rules requiring README and changelog updates for meaningful changes.
-

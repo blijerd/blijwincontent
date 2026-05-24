@@ -33,6 +33,15 @@ class SectionForm
                     ->searchable()
                     ->preload()
                     ->helperText('Alleen gebruikt wanneer het sectietype FAQ is. Items blijven centraal beheerd.'),
+                Select::make('downloadCategories')
+                    ->label('Download categorieen')
+                    ->relationship('downloadCategories', 'title')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Alleen gebruikt wanneer het sectietype Downloads is. Items en formats blijven centraal beheerd.'),
+                Toggle::make('downloads_show_category_intro')->label('Download categorie-intro tonen')->default(true),
+                Toggle::make('downloads_secure_enabled')->label('Beveiligde downloads toestaan')->default(true),
                 TextInput::make('faq_keyword')
                     ->label('FAQ trefwoord')
                     ->maxLength(255)

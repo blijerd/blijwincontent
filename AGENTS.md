@@ -133,8 +133,11 @@ Core content models:
 - `Redirect`
 - `FaqCategory`
 - `FaqItem`
+- `DownloadCategory`
+- `DownloadItem`
+- `DownloadFormat`
 
-Pages contain sections. Sections contain blocks or controlled relational content such as FAQ categories. Rich text belongs in Markdown fields.
+Pages contain sections. Sections contain blocks or controlled relational content such as FAQ and download categories. Rich text belongs in Markdown fields.
 
 Do not store page layouts, sections, blocks or translations as arbitrary JSON blobs. JSON casts are acceptable only for bounded settings where relational modeling adds no value.
 
@@ -155,6 +158,7 @@ Design content so GRAV concepts can map cleanly to:
 - redirects -> `redirects`
 - translated pages -> shared `translation_group_id`
 - GRAV FAQ data -> `faq_categories` and `faq_items`
+- GRAV downloads catalog data -> `download_categories`, `download_items` and `download_formats`
 
 Do not build importer behavior unless explicitly requested. Keep importer preparation in services and relational structures.
 
@@ -200,6 +204,7 @@ Current section types:
 - `rich_text`
 - `cta`
 - `faq`
+- `downloads`
 - `video`
 
 Each section type should have:
