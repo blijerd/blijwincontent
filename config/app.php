@@ -1,5 +1,7 @@
 <?php
 
+$settings = require __DIR__.'/settings.php';
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => $settings['app']['name'],
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => $settings['app']['url'],
 
     /*
     |--------------------------------------------------------------------------
@@ -78,11 +80,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => $settings['app']['locale'],
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => $settings['app']['fallback_locale'],
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => $settings['app']['faker_locale'],
 
     /*
     |--------------------------------------------------------------------------
@@ -119,8 +121,8 @@ return [
     */
 
     'maintenance' => [
-        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'driver' => $settings['app']['maintenance_driver'],
+        'store' => $settings['app']['maintenance_store'],
     ],
 
 ];

@@ -1,5 +1,7 @@
 <?php
 
+$settings = require __DIR__.'/settings.php';
+
 return [
 
     /*
@@ -15,23 +17,23 @@ return [
     */
 
     'postmark' => [
-        'key' => env('POSTMARK_API_KEY'),
+        'key' => null,
     ],
 
     'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        'key' => null,
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+        'key' => null,
+        'secret' => null,
+        'region' => $settings['services']['aws_region'],
     ],
 
     'slack' => [
         'notifications' => [
-            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'bot_user_oauth_token' => null,
+            'channel' => null,
         ],
     ],
 

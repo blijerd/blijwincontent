@@ -1,5 +1,7 @@
 <?php
 
+$settings = require __DIR__.'/settings.php';
+
 return [
 
     /*
@@ -14,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => $settings['mail']['default_mailer'],
 
     /*
     |--------------------------------------------------------------------------
@@ -39,14 +41,14 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'scheme' => $settings['mail']['smtp']['scheme'],
+            'url' => $settings['mail']['smtp']['url'],
+            'host' => $settings['mail']['smtp']['host'],
+            'port' => $settings['mail']['smtp']['port'],
+            'username' => $settings['mail']['smtp']['username'],
+            'password' => $settings['mail']['smtp']['password'],
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => $settings['mail']['smtp']['local_domain'],
         ],
 
         'ses' => [
@@ -55,10 +57,6 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
         ],
 
         'resend' => [
@@ -67,12 +65,12 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path' => $settings['mail']['sendmail_path'],
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => null,
         ],
 
         'array' => [
@@ -111,8 +109,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+        'address' => $settings['mail']['from_address'],
+        'name' => $settings['mail']['from_name'],
     ],
 
 ];

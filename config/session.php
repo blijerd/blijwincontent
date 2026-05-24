@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Str;
 
+$settings = require __DIR__.'/settings.php';
+
 return [
 
     /*
@@ -18,7 +20,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => $settings['session']['driver'],
 
     /*
     |--------------------------------------------------------------------------
@@ -32,9 +34,9 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => $settings['session']['lifetime'],
 
-    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+    'expire_on_close' => $settings['session']['expire_on_close'],
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +49,7 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    'encrypt' => $settings['session']['encrypt'],
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +75,7 @@ return [
     |
     */
 
-    'connection' => env('SESSION_CONNECTION'),
+    'connection' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +88,7 @@ return [
     |
     */
 
-    'table' => env('SESSION_TABLE', 'sessions'),
+    'table' => $settings['session']['table'],
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +103,7 @@ return [
     |
     */
 
-    'store' => env('SESSION_STORE'),
+    'store' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -127,10 +129,7 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug((string) env('APP_NAME', 'laravel')).'-session'
-    ),
+    'cookie' => Str::slug($settings['app']['name']).'-session',
 
     /*
     |--------------------------------------------------------------------------
@@ -143,7 +142,7 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+    'path' => $settings['session']['path'],
 
     /*
     |--------------------------------------------------------------------------
@@ -156,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => $settings['session']['domain'],
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +168,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => $settings['session']['secure_cookie'],
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +181,7 @@ return [
     |
     */
 
-    'http_only' => env('SESSION_HTTP_ONLY', true),
+    'http_only' => $settings['session']['http_only'],
 
     /*
     |--------------------------------------------------------------------------
@@ -199,7 +198,7 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+    'same_site' => $settings['session']['same_site'],
 
     /*
     |--------------------------------------------------------------------------
@@ -212,6 +211,6 @@ return [
     |
     */
 
-    'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+    'partitioned' => $settings['session']['partitioned'],
 
 ];

@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
+$settings = require __DIR__.'/settings.php';
 
 return [
 
@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => $settings['cache']['default_store'],
 
     /*
     |--------------------------------------------------------------------------
@@ -41,10 +41,10 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_CACHE_CONNECTION'),
-            'table' => env('DB_CACHE_TABLE', 'cache'),
-            'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
-            'lock_table' => env('DB_CACHE_LOCK_TABLE'),
+            'connection' => null,
+            'table' => 'cache',
+            'lock_connection' => null,
+            'lock_table' => 'cache_locks',
         ],
 
         'file' => [
@@ -55,18 +55,18 @@ return [
 
         'memcached' => [
             'driver' => 'memcached',
-            'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
+            'persistent_id' => null,
             'sasl' => [
-                env('MEMCACHED_USERNAME'),
-                env('MEMCACHED_PASSWORD'),
+                null,
+                null,
             ],
             'options' => [
                 // Memcached::OPT_CONNECT_TIMEOUT => 2000,
             ],
             'servers' => [
                 [
-                    'host' => env('MEMCACHED_HOST', '127.0.0.1'),
-                    'port' => env('MEMCACHED_PORT', 11211),
+                    'host' => '127.0.0.1',
+                    'port' => 11211,
                     'weight' => 100,
                 ],
             ],
@@ -74,17 +74,17 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
-            'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
+            'connection' => 'cache',
+            'lock_connection' => 'default',
         ],
 
         'dynamodb' => [
             'driver' => 'dynamodb',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            'table' => env('DYNAMODB_CACHE_TABLE', 'cache'),
-            'endpoint' => env('DYNAMODB_ENDPOINT'),
+            'key' => null,
+            'secret' => null,
+            'region' => $settings['services']['aws_region'],
+            'table' => 'cache',
+            'endpoint' => null,
         ],
 
         'octane' => [
@@ -112,6 +112,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+    'prefix' => $settings['cache']['prefix'],
 
 ];
