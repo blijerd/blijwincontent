@@ -91,6 +91,18 @@ De kern van de oude GRAV `downloads` plugin is relationeel overgezet:
 
 De bestaande GRAV YAML-import is bewust nog niet gebouwd. De relationele structuur sluit wel aan op GRAV downloads-categorieen, preview images, formats en secure delivery.
 
+## Blijwin OS Koppeling
+
+Het CMS heeft een dedicated `BlijwinosApiClient` voor betrouwbare uitwisseling met Blijwin OS:
+
+- lezen van catalogusdata via `/api/blijwinboekingen/catalogus`
+- lezen van prijslijstdata via `/api/blijwinboekingen/prijslijsten`
+- schrijven van publieke aanvragen via `/api/blijwinboekingen/aanvragen`
+- HMAC-signing voor write requests met `X-Blijwin-Timestamp`, `X-Blijwin-Request-Id` en `X-Blijwin-Signature`
+- timeouts, retries, read-cache en relationele request logging in `blijwinos_api_logs`
+
+Functionele defaults staan in `config/settings.php` onder `blijwinos`. De write secret moet per omgeving veilig worden ingevuld voordat schrijven naar Blijwin OS werkt.
+
 ## Settings
 
 Functionele applicatie-instellingen staan zoveel mogelijk in `config/settings.php`, niet in `.env`. Denk aan appnaam, publieke URL, locales, cache, queue, session, logging, mail defaults en filesystem defaults.
@@ -136,6 +148,7 @@ composer test:full
 ```
 
 De volledige test-set staat in `docs/test-set.md`. Gebruik gerichte profielen zoals `composer test:downloads`, `composer test:faq`, `composer test:tracking` en `composer test:content` tijdens featurewerk.
+Voor de Blijwin OS-koppeling is er `composer test:blijwinos`.
 
 ## Changelog
 

@@ -70,6 +70,22 @@ Do not introduce React, Vue, Next.js, microservices or distributed event infrast
 
 ---
 
+## Blijwin OS Coupling
+
+The CMS may cooperate with Blijwin OS through explicit service clients only.
+
+Rules:
+
+- Keep Blijwin OS HTTP logic in `App\Services\Blijwinos`.
+- Keep read/write use cases behind Actions when feature code calls the coupling.
+- Reads must use timeouts, retries and bounded caching where appropriate.
+- Writes must use the Blijwin OS HMAC contract and must not run without a configured write secret.
+- Log API attempts in relational tables without storing secrets or raw personal payloads.
+- Do not call Blijwin OS from controllers, Blade views, Filament resources or Livewire components directly.
+- Keep functional defaults in `config/settings.php`; keep real secrets out of Git.
+
+---
+
 ## Hosting And Deployment
 
 The application must run on DirectAdmin-style hosting with:

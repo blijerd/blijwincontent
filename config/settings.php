@@ -140,4 +140,21 @@ return [
             'download_local_files' => true,
         ],
     ],
+
+    'blijwinos' => [
+        'enabled' => true,
+        'base_url' => 'https://www.blijwin.nl',
+        'origin' => 'blijwincontent',
+        'timeout_seconds' => 10,
+        'retries' => 2,
+        'retry_delay_ms' => 250,
+        'read_cache_seconds' => 300,
+        'catalog_key' => null,
+        'write_hmac_secret' => null,
+        'endpoints' => [
+            'catalog' => '/api/blijwinboekingen/catalogus',
+            'price_lists' => '/api/blijwinboekingen/prijslijsten',
+            'booking_requests' => '/api/blijwinboekingen/aanvragen',
+        ],
+    ],
 ];

@@ -11,6 +11,7 @@ composer test:fast
 composer test:architecture
 composer test:cms
 composer test:content
+composer test:blijwinos
 composer test:downloads
 composer test:faq
 composer test:tracking
@@ -26,6 +27,7 @@ composer test:full
 - `test:architecture`: non-database architecture/policy tests when present.
 - `test:cms`: CMS unit and feature tests.
 - `test:content`: CMS, FAQ and downloads content behavior.
+- `test:blijwinos`: Blijwin OS read/write API coupling behavior.
 - `test:downloads`: downloads rendering, delivery and secure request flow.
 - `test:faq`: FAQ rendering and import behavior.
 - `test:tracking`: tracking endpoints and persistence behavior.

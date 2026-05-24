@@ -8,7 +8,7 @@ $profile = $argv[1] ?? null;
 $arguments = array_slice($argv, 2);
 
 if (! is_string($profile) || $profile === '') {
-    fwrite(STDERR, "Usage: php scripts/run-test-profile.php <dev|smoke|fast|architecture|cms|content|downloads|faq|tracking|full> [selector-or-path ...] [artisan-test-options]\n");
+    fwrite(STDERR, "Usage: php scripts/run-test-profile.php <dev|smoke|fast|architecture|cms|content|blijwinos|downloads|faq|tracking|full> [selector-or-path ...] [artisan-test-options]\n");
 
     exit(1);
 }
@@ -37,6 +37,7 @@ $profileSubjects = [
     'architecture' => 'composer test:architecture',
     'cms' => 'composer test:cms',
     'content' => 'composer test:content',
+    'blijwinos' => 'composer test:blijwinos',
     'downloads' => 'composer test:downloads',
     'faq' => 'composer test:faq',
     'tracking' => 'composer test:tracking',
@@ -58,6 +59,7 @@ $paths = match ($profile) {
     'architecture' => architectureTestPaths($root),
     'cms' => cmsTestPaths($root, $selectors),
     'content' => contentTestPaths($root, $selectors),
+    'blijwinos' => namedTestPaths($root, ['tests/Feature/Blijwinos']),
     'downloads' => namedTestPaths($root, ['tests/Feature/Downloads']),
     'faq' => namedTestPaths($root, ['tests/Feature/Faq', 'tests/Unit/Faq']),
     'tracking' => namedTestPaths($root, ['tests/Feature/Tracking']),
