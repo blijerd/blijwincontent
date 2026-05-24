@@ -183,3 +183,14 @@
     background: linear-gradient(90deg, var(--bw-admin-orange), var(--bw-admin-pink), var(--bw-admin-purple-700), var(--bw-admin-blue));
     content: '';
 }
+
+.fi-simple-main .fi-fo-field-wrp-label,
+.fi-simple-main .fi-fo-field-wrp-label span,
+.fi-simple-main .fi-checkbox-list-option-label,
+.fi-simple-main .fi-checkbox-input + span {
+    color: var(--bw-admin-ink);
+}
+
+.fi-simple-main .fi-fo-field-wrp-label sup {
+    color: var(--bw-admin-pink);
+}

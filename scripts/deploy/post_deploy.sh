@@ -24,7 +24,8 @@ if [ ! -f "vendor/autoload.php" ]; then
         exit 1
     fi
 
-    "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+    COMPOSER_PATH="$(command -v "$COMPOSER_BIN")"
+    "$PHP_BIN" "$COMPOSER_PATH" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 fi
 
 "$PHP_BIN" artisan migrate --force
