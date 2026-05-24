@@ -1,5 +1,7 @@
 <?php
 
+$isTesting = ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? null) === 'testing';
+
 return [
     'app' => [
         'name' => 'Blijwin Content CMS',
@@ -18,7 +20,7 @@ return [
     ],
 
     'cache' => [
-        'default_store' => 'database',
+        'default_store' => $isTesting ? 'array' : 'database',
         'prefix' => 'blijwincontent-cache-',
     ],
 

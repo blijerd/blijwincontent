@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Pages\Schemas;
 use App\Enums\PageStatus;
 use App\Enums\TemplateType;
 use App\Models\Page;
+use App\Support\Filament\CmsMarkdownEditor;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -41,7 +41,12 @@ class PageForm
                                     ->required()
                                     ->default(PageStatus::Draft->value),
                                 DateTimePicker::make('published_at'),
-                                MarkdownEditor::make('excerpt_markdown')->columnSpanFull(),
+                                CmsMarkdownEditor::make(
+                                    'excerpt_markdown',
+                                    'Korte pagina-intro in Markdown voor samenvattingen, lijstweergaven en SEO-context.',
+                                    '14rem',
+                                    3000,
+                                ),
                                 TextInput::make('sort_order')->numeric()->default(0),
                             ])->columns(2),
                         Tab::make('Translations')

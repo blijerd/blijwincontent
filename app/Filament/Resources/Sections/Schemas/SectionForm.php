@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Sections\Schemas;
 
 use App\Enums\SectionType;
-use Filament\Forms\Components\MarkdownEditor;
+use App\Support\Filament\CmsMarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -20,7 +20,12 @@ class SectionForm
                     ->options(collect(SectionType::cases())->mapWithKeys(fn (SectionType $type) => [$type->value => $type->name])->all())
                     ->required(),
                 TextInput::make('title')->maxLength(255),
-                MarkdownEditor::make('intro_markdown')->columnSpanFull(),
+                CmsMarkdownEditor::make(
+                    'intro_markdown',
+                    'Introductietekst voor deze sectie. Geschikt voor koptekst, korte alineas en interne links.',
+                    '16rem',
+                    6000,
+                ),
                 TextInput::make('sort_order')->numeric()->default(0),
                 Toggle::make('is_visible')->default(true),
             ]);
